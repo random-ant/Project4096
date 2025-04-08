@@ -2,7 +2,7 @@ import mayflower.*;
 
 public class MyMayflower extends Mayflower {
    public MyMayflower() {
-      super("Game", 800, 600);
+      super("Game", 800, 1000);
    }
 
    public void init() {
