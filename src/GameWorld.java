@@ -15,6 +15,8 @@ public class GameWorld extends World {
     }
 
     private void renderGrid() {
+        addObject(new Border(), 40, 245);
+        addObject(new Title(), 301, 55);
 
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
