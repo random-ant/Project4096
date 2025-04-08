@@ -1,4 +1,5 @@
 import mayflower.*;
+import java.util.ArrayList;
 
 public class GameWorld extends World {
     private Tile[][] grid;
@@ -7,10 +8,14 @@ public class GameWorld extends World {
 
     public GameWorld() {
         grid = new Tile[GRID_HEIGHT][GRID_WIDTH];
+        grid[1][1] = new Tile();
         // setBackground("grey");
         // addObject(new Tile(), 30, 30);
 
         renderGrid();
+
+        System.out.println(getEmptyTilesInRow(0));
+        System.out.println(getEmptyTilesInColumn(1));
 
     }
 
@@ -28,5 +33,30 @@ public class GameWorld extends World {
     @Override
     public void act() {
     }
+
+    // returns arraylist of column indexes of grid in row input that are empty
+    public ArrayList<Integer> getEmptyTilesInRow(int row) {
+        ArrayList<Integer> out = new ArrayList<Integer>(GRID_WIDTH);
+        for (int i = 0; i < GRID_WIDTH; i++) {
+            if (grid[row][i] == null) {
+                out.add(i);
+            }
+        }
+        return out;
+    }
+
+    public ArrayList<Integer> getEmptyTilesInColumn(int column) {
+        ArrayList<Integer> out = new ArrayList<Integer>(GRID_WIDTH);
+        for (int i = 0; i < GRID_HEIGHT; i++) {
+            if (grid[i][column] == null) {
+                out.add(i);
+            }
+        }
+        return out;
+    }
+
+    
+
+    
 
 }
