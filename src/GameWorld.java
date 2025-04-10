@@ -32,7 +32,7 @@ public class GameWorld extends World {
                 int y_coord = (i * TILE_WIDTH) + OFFSET_Y;
                 addObject(new Tile(), x_coord, y_coord);
 
-                Block b = new Block(2, BColor.BLUE);
+                Block b = new Block(2, BColor.RED);
                 addObject(b, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord + (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
             }
         }
