@@ -6,10 +6,12 @@ public class Block extends Actor {
 
     private int value;
     private BColor color;
+    private Coordinate coord;
 
-    public Block(int value, BColor color) {
+    public Block(int value, BColor color, Coordinate coord) {
         this.value = value;
         this.color = color;
+        this.coord = coord;
         MayflowerImage img = new MayflowerImage("src/img/neutral-block.png");
         img.scale(GameWorld.BLOCK_WIDTH, GameWorld.BLOCK_HEIGHT);
         setImage(img);
@@ -19,5 +21,9 @@ public class Block extends Actor {
         World w = getWorld();
         w.showText("" + value, getCenterX() - (GameWorld.TILE_WIDTH - GameWorld.BLOCK_WIDTH),
                 getCenterY() + (GameWorld.TILE_HEIGHT - GameWorld.BLOCK_HEIGHT));
+    }
+
+    public Coordinate getCoordinate() {
+        return coord;
     }
 }

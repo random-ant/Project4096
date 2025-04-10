@@ -17,8 +17,8 @@ public class GameWorld extends World {
 
         renderGrid();
 
-        System.out.println(getEmptyTilesInRow(0));
-        System.out.println(getEmptyTilesInColumn(1));
+        System.out.println(getEmptyTiles());
+        System.out.println(getRandomEmptyTile());
 
     }
 
@@ -32,7 +32,7 @@ public class GameWorld extends World {
                 int y_coord = (i * TILE_WIDTH) + OFFSET_Y;
                 addObject(new Tile(), x_coord, y_coord);
 
-                Block b = new Block(2, BColor.BLUE);
+                Block b = new Block(2, BColor.NEUTRAL, new Coordinate(i, j));
                 addObject(b, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord + (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
             }
         }
@@ -42,29 +42,37 @@ public class GameWorld extends World {
     public void act() {
     }
 
-    // returns arraylist of column indexes of grid in row input that are empty
-    public ArrayList<Integer> getEmptyTilesInRow(int row) {
-        ArrayList<Integer> out = new ArrayList<Integer>(GRID_WIDTH);
-        for (int i = 0; i < GRID_WIDTH; i++) {
-            if (grid[row][i] == null) {
-                out.add(i);
-            }
-        }
-        return out;
-    }
-
-    public ArrayList<Integer> getEmptyTilesInColumn(int column) {
-        ArrayList<Integer> out = new ArrayList<Integer>(GRID_WIDTH);
+    public ArrayList<Coordinate> getEmptyTiles() {
+        ArrayList<Coordinate> out = new ArrayList<Coordinate>(GRID_HEIGHT * GRID_WIDTH);
         for (int i = 0; i < GRID_HEIGHT; i++) {
-            if (grid[i][column] == null) {
-                out.add(i);
+            for (int j = 0; j < GRID_WIDTH; j++) {
+                if (grid[i][j] == null) {
+                    out.add(new Coordinate(i, j));
+                }
             }
         }
         return out;
     }
 
-    
+    public Coordinate getRandomEmptyTile() {
+        ArrayList<Coordinate> empty = getEmptyTiles();
+        int numEmpty = empty.size();
+        int randomIndex = (int) (Math.random() * numEmpty);
+        return empty.get(randomIndex);
+    }
 
-    
+    public void spawnBlock() {
+        double spawnValue = Math.random();
+        int value;
+        if (spawnValue <= 0.7) {
+            value = 2;
+        } else if (spawnValue <= 0.9) {
+            value = 4;
+        } else {
+            value = 8;
+        }
+        Block block = new Block(value, BColor.NEUTRAL, getRandomEmptyTile());
+
+    }
 
 }
