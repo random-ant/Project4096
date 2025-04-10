@@ -34,7 +34,6 @@ public class Block extends Actor {
         World w = getWorld();
         w.showText("" + value, getCenterX() - (GameWorld.TILE_WIDTH - GameWorld.BLOCK_WIDTH),
                 getCenterY() + (GameWorld.TILE_HEIGHT - GameWorld.BLOCK_HEIGHT));
-
     }
 
     public Coordinate getCoordinate() {
