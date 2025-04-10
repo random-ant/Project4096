@@ -12,6 +12,23 @@ public class GameWorld extends World {
     public GameWorld() {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
         grid[1][1] = new Block(2, BColor.BLUE, new Coordinate(1, 1));
+        grid[2][1] = new Block(4, BColor.BLUE, new Coordinate(1, 1));
+        grid[3][1] = new Block(8, BColor.BLUE, new Coordinate(1, 1));
+        grid[4][1] = new Block(16, BColor.BLUE, new Coordinate(1, 1));
+        grid[5][1] = new Block(32, BColor.BLUE, new Coordinate(1, 1));
+        grid[6][1] = new Block(64, BColor.BLUE, new Coordinate(1, 1));
+        grid[7][1] = new Block(128, BColor.BLUE, new Coordinate(1, 1));
+        grid[8][1] = new Block(256, BColor.BLUE, new Coordinate(1, 1));
+
+        grid[1][2] = new Block(2, BColor.RED, new Coordinate(1, 1));
+        grid[2][2] = new Block(4, BColor.RED, new Coordinate(1, 1));
+        grid[3][2] = new Block(8, BColor.RED, new Coordinate(1, 1));
+        grid[4][2] = new Block(16, BColor.RED, new Coordinate(1, 1));
+        grid[5][2] = new Block(32, BColor.RED, new Coordinate(1, 1));
+        grid[6][2] = new Block(64, BColor.RED, new Coordinate(1, 1));
+        grid[7][2] = new Block(128, BColor.RED, new Coordinate(1, 1));
+        grid[8][2] = new Block(256, BColor.RED, new Coordinate(1, 1));
+
 
         addObject(new Border(), 40, 245);
         addObject(new Title(), 301, 55);
