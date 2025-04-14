@@ -11,38 +11,13 @@ public class GameWorld extends World {
 
     public GameWorld() {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
-        grid[1][1] = new Block(2, BColor.BLUE, new Coordinate(1, 1));
-        grid[2][1] = new Block(4, BColor.BLUE, new Coordinate(1, 1));
-        grid[3][1] = new Block(8, BColor.BLUE, new Coordinate(1, 1));
-        grid[4][1] = new Block(16, BColor.BLUE, new Coordinate(1, 1));
-        grid[5][1] = new Block(32, BColor.BLUE, new Coordinate(1, 1));
-        grid[6][1] = new Block(64, BColor.BLUE, new Coordinate(1, 1));
-        grid[7][1] = new Block(128, BColor.BLUE, new Coordinate(1, 1));
-        grid[8][1] = new Block(256, BColor.BLUE, new Coordinate(1, 1));
-        grid[1][3] = new Block(512, BColor.BLUE, new Coordinate());
-        grid[2][3] = new Block(1024, BColor.BLUE, new Coordinate());
-        grid[3][3] = new Block(2048, BColor.BLUE, new Coordinate());
-
-        grid[1][2] = new Block(2, BColor.RED, new Coordinate(1, 1));
-        grid[2][2] = new Block(4, BColor.RED, new Coordinate(1, 1));
-        grid[3][2] = new Block(8, BColor.RED, new Coordinate(1, 1));
-        grid[4][2] = new Block(16, BColor.RED, new Coordinate(1, 1));
-        grid[5][2] = new Block(32, BColor.RED, new Coordinate(1, 1));
-        grid[6][2] = new Block(64, BColor.RED, new Coordinate(1, 1));
-        grid[7][2] = new Block(128, BColor.RED, new Coordinate(1, 1));
-        grid[8][2] = new Block(256, BColor.RED, new Coordinate(1, 1));
-        grid[4][3] = new Block(512, BColor.RED, new Coordinate(1, 1));
-        grid[5][3] = new Block(1024, BColor.RED, new Coordinate(1, 1));
-        grid[6][3] = new Block(2048, BColor.RED, new Coordinate(1, 1));
-
 
         addObject(new Border(), 40, 245);
         addObject(new Title(), 301, 55);
+        for (int i = 0; i < 10; i++)
+            spawnRandomBlock();
+
         renderGrid();
-
-        System.out.println(getEmptyTiles());
-        System.out.println(getRandomEmptyTile());
-
     }
 
     private void renderGrid() {
@@ -63,17 +38,125 @@ public class GameWorld extends World {
 
     @Override
     public void act() {
+        int BLOCKS_SPAWNED_PER_MOVE = 10;
         // listen for key presses and act accordingly
         if (keyPresssed(Keyboard.KEY_UP)) {
-            System.out.println("Up key pressed");
-            spawnBlock();
+            for (int j = 0; j < GRID_WIDTH; j++) {
+                ArrayList<Block> col = new ArrayList<Block>();
+                for (int i = 0; i < GRID_HEIGHT; i++) {
+                    col.add(grid[i][j]);
+                }
+
+                ArrayList<Block> result = check(col);
+                Collections.reverse(result);
+                // add empty blocks
+                result.addAll(result.size(), Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
+
+                // put in grid
+                for (int i = 0; i < GRID_HEIGHT; i++) {
+                    grid[i][j] = result.get(i);
+                }
+            }
+
+            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+                spawnRandomBlock();
+            renderGrid();
+
         } else if (keyPresssed(Keyboard.KEY_DOWN)) {
-            System.out.println("Down key pressed");
+            for (int j = 0; j < GRID_WIDTH; j++) {
+                ArrayList<Block> col = new ArrayList<Block>();
+                for (int i = GRID_HEIGHT - 1; i >= 0; i--) {
+                    col.add(grid[i][j]);
+                }
+
+                ArrayList<Block> result = check(col);
+                // add empty blocks
+                result.addAll(0, Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
+
+                // put in grid
+                for (int i = 0; i < GRID_HEIGHT; i++) {
+                    grid[i][j] = result.get(i);
+                }
+            }
+            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+                spawnRandomBlock();
+            renderGrid();
+
         } else if (keyPresssed(Keyboard.KEY_LEFT)) {
-            System.out.println("Left key pressed");
+            for (int i = 0; i < GRID_HEIGHT; i++) {
+                ArrayList<Block> row = new ArrayList<Block>();
+                for (int j = 0; j < GRID_WIDTH; j++) {
+                    row.add(grid[i][j]);
+                }
+
+                ArrayList<Block> result = check(row);
+                Collections.reverse(result);
+                // add empty blocks
+                result.addAll(result.size(), Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
+
+                // put in grid
+                for (int j = 0; j < GRID_HEIGHT; j++) {
+                    grid[i][j] = result.get(j);
+                }
+            }
+            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+                spawnRandomBlock();
+            renderGrid();
+
         } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
-            System.out.println("Right key pressed");
+            for (int i = 0; i < GRID_HEIGHT; i++) {
+                ArrayList<Block> row = new ArrayList<Block>();
+                for (int j = GRID_WIDTH - 1; j >= 0; j--) {
+                    row.add(grid[i][j]);
+                }
+
+                ArrayList<Block> result = check(row);
+                // add empty blocks
+                result.addAll(0, Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
+
+                // put in grid
+                for (int j = 0; j < GRID_HEIGHT; j++) {
+                    grid[i][j] = result.get(j);
+                }
+            }
+            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+                spawnRandomBlock();
+            renderGrid();
+
         }
+
+        if (keyPresssed(Keyboard.KEY_SPACE)) {
+            System.out.println("Space key pressed");
+            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+                spawnRandomBlock();
+        }
+
+    }
+
+    // Get list of arrays
+    public ArrayList<Block> check(ArrayList<Block> blocks) {
+        Stack<Block> stack = new Stack<Block>();
+
+        for (Block b : blocks) {
+            Block currentBlock = b;
+            if (currentBlock == null)
+                continue;
+
+            currentBlock.setColor(BColor.RED);
+            while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
+                Block top = stack.pop();
+                Block newBlock = new Block(top.getValue() * 2, BColor.RED, new Coordinate());
+                currentBlock = newBlock;
+            }
+            stack.add(currentBlock);
+        }
+
+        ArrayList<Block> result = new ArrayList<Block>();
+        // add stack elements to result array
+        while (!stack.empty())
+            result.add(stack.pop());
+
+        return result;
     }
 
     public ArrayList<Coordinate> getEmptyTiles() {
@@ -95,7 +178,7 @@ public class GameWorld extends World {
         return empty.get(randomIndex);
     }
 
-    public void spawnBlock() {
+    public void spawnRandomBlock() {
         double spawnValue = Math.random();
         int value;
         if (spawnValue <= 0.7) {
@@ -105,15 +188,13 @@ public class GameWorld extends World {
         } else {
             value = 8;
         }
-        //Block block = new Block(value, BColor.BLUE, getRandomEmptyTile());
+        // Block block = new Block(value, BColor.BLUE, getRandomEmptyTile());
         Coordinate g = getRandomEmptyTile();
         grid[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE, new Coordinate());
-        renderGrid();
     }
 
     private boolean keyPresssed(int key) {
         return Mayflower.isKeyDown(key) && !Mayflower.wasKeyDown(key);
     }
 
-    
 }
