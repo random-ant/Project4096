@@ -12,7 +12,7 @@ public class GameWorld extends World {
     public GameWorld() {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
 
-        addObject(new Border(), 40, 245);
+        addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
         for (int i = 0; i < 10; i++)
             spawnRandomBlock();
@@ -145,7 +145,7 @@ public class GameWorld extends World {
             currentBlock.setColor(BColor.RED);
             while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
                 Block top = stack.pop();
-                Block newBlock = new Block(top.getValue() * 2, BColor.RED, new Coordinate());
+                Block newBlock = new Block(top.getValue() * 2, BColor.RED);
                 currentBlock = newBlock;
             }
             stack.add(currentBlock);
@@ -181,18 +181,23 @@ public class GameWorld extends World {
     public void spawnRandomBlock() {
         double spawnValue = Math.random();
         int value;
-        if (spawnValue <= 0.7) {
+        if (spawnValue <= 0.7) // 70% chance
             value = 2;
-        } else if (spawnValue <= 0.9) {
+        else if (spawnValue <= 0.9) // 20% chance
             value = 4;
-        } else {
+        else // 10% chance
             value = 8;
-        }
-        // Block block = new Block(value, BColor.BLUE, getRandomEmptyTile());
+
         Coordinate g = getRandomEmptyTile();
-        grid[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE, new Coordinate());
+        grid[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE);
     }
 
+    /**
+     * Returns whether or not a key was newly pressed down on this frame
+     * 
+     * @param key a KEYBOARD constant that represents which key to check for
+     * @return true if the key was newly pressed down on the frame, false otherwise
+     */
     private boolean keyPresssed(int key) {
         return Mayflower.isKeyDown(key) && !Mayflower.wasKeyDown(key);
     }
