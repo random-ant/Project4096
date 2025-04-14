@@ -3,6 +3,7 @@ import java.util.*;
 
 public class GameWorld extends World {
     private Block[][] grid;
+    private Map<Coordinate, Boolean> topWalls, leftWalls;
 
     public static int GRID_HEIGHT = 10, GRID_WIDTH = 10;
     public static int OFFSET_X = 45, OFFSET_Y = 250;
@@ -11,6 +12,9 @@ public class GameWorld extends World {
 
     public GameWorld() {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
+        topWalls = new HashMap<Coordinate, Boolean>();
+        leftWalls = new HashMap<Coordinate, Boolean>();
+        topWalls.put(new Coordinate(1, 1), true);
 
         addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
@@ -25,12 +29,29 @@ public class GameWorld extends World {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 int x_coord = (j * TILE_WIDTH) + OFFSET_X;
                 int y_coord = (i * TILE_WIDTH) + OFFSET_Y;
+
+                // add base tiles
                 addObject(new Tile(), x_coord, y_coord);
 
+                // add blocks
                 Block currBlock = grid[i][j];
                 if (currBlock != null) {
                     addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2,
                             y_coord + (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
+                }
+            }
+        }
+
+        // spawn walls
+        for (int i = 0; i < GRID_HEIGHT; i++) {
+            for (int j = 0; j < GRID_WIDTH; j++) {
+                int x_coord = (j * TILE_WIDTH) + OFFSET_X;
+                int y_coord = (i * TILE_WIDTH) + OFFSET_Y;
+
+                // add walls
+                Coordinate c = new Coordinate(i, j);
+                if (topWalls.containsKey(c)) {
+                    addObject(new HorizontalWall(), x_coord - 5, y_coord - 5);
                 }
             }
         }

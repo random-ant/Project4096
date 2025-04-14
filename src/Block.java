@@ -1,5 +1,4 @@
 import mayflower.Actor;
-import mayflower.Color;
 import mayflower.MayflowerImage;
 import mayflower.World;
 
@@ -33,8 +32,6 @@ public class Block extends Actor {
     }
 
     public void act() {
-        World w = getWorld();
-
     }
 
     public int getValue() {

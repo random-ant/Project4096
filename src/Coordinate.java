@@ -7,6 +7,30 @@ public class Coordinate {
         col = 0;
     }
 
+    @Override
+    public int hashCode() {
+        int result = 1;
+        result = 31 * row;
+        result += 439 * col;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Coordinate other = (Coordinate) obj;
+        if (row != other.row)
+            return false;
+        if (col != other.col)
+            return false;
+        return true;
+    }
+
     public Coordinate(int row, int col) {
         this.row = row;
         this.col = col;
@@ -32,4 +56,5 @@ public class Coordinate {
     public String toString() {
         return "(" + row + ", " + col + ")";
     }
+
 }
