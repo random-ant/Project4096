@@ -11,19 +11,15 @@ public class GameWorld extends World {
 
     public GameWorld() {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
-        grid[1][0] = new Block(2, BColor.BLUE, new Coordinate(1, 1));
-        grid[2][0] = new Block(2, BColor.BLUE, new Coordinate(1, 1));
-        grid[3][0] = new Block(4, BColor.BLUE, new Coordinate(1, 1));
-        grid[4][0] = new Block(2, BColor.BLUE, new Coordinate(1, 1));
-        grid[5][0] = new Block(4, BColor.BLUE, new Coordinate(1, 1));
+        grid[0][1] = new Block(2, BColor.BLUE, new Coordinate(1, 1));
+        grid[0][2] = new Block(2, BColor.BLUE, new Coordinate(1, 1));
+        grid[0][3] = new Block(4, BColor.BLUE, new Coordinate(1, 1));
+        grid[0][4] = new Block(2, BColor.BLUE, new Coordinate(1, 1));
+        grid[0][5] = new Block(4, BColor.BLUE, new Coordinate(1, 1));
 
         addObject(new Border(), 40, 245);
         addObject(new Title(), 301, 55);
         renderGrid();
-
-        System.out.println(getEmptyTiles());
-        System.out.println(getRandomEmptyTile());
-
     }
 
     private void renderGrid() {
@@ -46,50 +42,94 @@ public class GameWorld extends World {
     public void act() {
         // listen for key presses and act accordingly
         if (keyPresssed(Keyboard.KEY_UP)) {
-            System.out.println("Up key pressed");
-
             for (int j = 0; j < GRID_WIDTH; j++) {
-                Block[] col = new Block[GRID_HEIGHT];
+                ArrayList<Block> col = new ArrayList<Block>();
                 for (int i = 0; i < GRID_HEIGHT; i++) {
-                    col[i] = grid[i][j];
-                }
-
-                Block[] result = check(col);
-
-                grid[j] = result;
-            }
-
-            renderGrid();
-
-        } else if (true || keyPresssed(Keyboard.KEY_DOWN)) {
-            System.out.println("Down key pressed");
-
-            for (int j = 0; j < GRID_WIDTH; j++) {
-                Block[] col = new Block[GRID_HEIGHT];
-                for (int i = GRID_HEIGHT - 1; i >= 0; i--) {
-                    col[GRID_HEIGHT - 1 - i] = grid[i][j];
+                    col.add(grid[i][j]);
                 }
 
                 ArrayList<Block> result = check(col);
+                Collections.reverse(result);
+                // add empty blocks
+                result.addAll(result.size(), Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
 
-                grid[j] = result;
+                // put in grid
+                for (int i = 0; i < GRID_HEIGHT; i++) {
+                    grid[i][j] = result.get(i);
+                }
             }
 
             renderGrid();
 
-        } else if (keyPresssed(Keyboard.KEY_SPACE)) {
+        } else if (keyPresssed(Keyboard.KEY_DOWN)) {
+            for (int j = 0; j < GRID_WIDTH; j++) {
+                ArrayList<Block> col = new ArrayList<Block>();
+                for (int i = GRID_HEIGHT - 1; i >= 0; i--) {
+                    col.add(grid[i][j]);
+                }
+
+                ArrayList<Block> result = check(col);
+                // add empty blocks
+                result.addAll(0, Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
+
+                // put in grid
+                for (int i = 0; i < GRID_HEIGHT; i++) {
+                    grid[i][j] = result.get(i);
+                }
+            }
+
+            renderGrid();
+
+        } else if (keyPresssed(Keyboard.KEY_LEFT)) {
+            for (int i = 0; i < GRID_HEIGHT; i++) {
+                ArrayList<Block> row = new ArrayList<Block>();
+                for (int j = 0; j < GRID_WIDTH; j++) {
+                    row.add(grid[i][j]);
+                }
+
+                ArrayList<Block> result = check(row);
+                Collections.reverse(result);
+                // add empty blocks
+                result.addAll(result.size(), Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
+
+                // put in grid
+                for (int j = 0; j < GRID_HEIGHT; j++) {
+                    grid[i][j] = result.get(j);
+                }
+            }
+
+            renderGrid();
+
+        } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
+            for (int i = 0; i < GRID_HEIGHT; i++) {
+                ArrayList<Block> row = new ArrayList<Block>();
+                for (int j = GRID_WIDTH - 1; j >= 0; j--) {
+                    row.add(grid[i][j]);
+                }
+
+                ArrayList<Block> result = check(row);
+                // add empty blocks
+                result.addAll(0, Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
+
+                // put in grid
+                for (int j = 0; j < GRID_HEIGHT; j++) {
+                    grid[i][j] = result.get(j);
+                }
+            }
+
+            renderGrid();
+
+        }
+
+        if (keyPresssed(Keyboard.KEY_SPACE)) {
             System.out.println("Space key pressed");
             spawnBlock();
-        } else if (keyPresssed(Keyboard.KEY_ESCAPE)) {
-            System.out.println("Escape key pressed");
-        } else if (keyPresssed(Keyboard.KEY_LEFT)) {
-        } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
         }
 
     }
 
     // Get list of arrays
-    public ArrayList<Block> check(Block[] blocks) {
+    public ArrayList<Block> check(ArrayList<Block> blocks) {
         Stack<Block> stack = new Stack<Block>();
 
         for (Block b : blocks) {
@@ -97,9 +137,10 @@ public class GameWorld extends World {
             if (currentBlock == null)
                 continue;
 
+            currentBlock.setColor(BColor.RED);
             while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
                 Block top = stack.pop();
-                Block newBlock = new Block(top.getValue() * 2, BColor.NEUTRAL, top.getCoordinate());
+                Block newBlock = new Block(top.getValue() * 2, BColor.RED, top.getCoordinate());
                 currentBlock = newBlock;
             }
             stack.add(currentBlock);
@@ -107,9 +148,8 @@ public class GameWorld extends World {
 
         ArrayList<Block> result = new ArrayList<Block>();
         // add stack elements to result array
-        while (!stack.empty()) {
+        while (!stack.empty())
             result.add(stack.pop());
-        }
 
         return result;
     }
