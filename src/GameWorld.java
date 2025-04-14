@@ -19,6 +19,9 @@ public class GameWorld extends World {
         grid[6][1] = new Block(64, BColor.BLUE, new Coordinate(1, 1));
         grid[7][1] = new Block(128, BColor.BLUE, new Coordinate(1, 1));
         grid[8][1] = new Block(256, BColor.BLUE, new Coordinate(1, 1));
+        grid[1][3] = new Block(512, BColor.BLUE, new Coordinate());
+        grid[2][3] = new Block(1024, BColor.BLUE, new Coordinate());
+        grid[3][3] = new Block(2048, BColor.BLUE, new Coordinate());
 
         grid[1][2] = new Block(2, BColor.RED, new Coordinate(1, 1));
         grid[2][2] = new Block(4, BColor.RED, new Coordinate(1, 1));
@@ -28,6 +31,9 @@ public class GameWorld extends World {
         grid[6][2] = new Block(64, BColor.RED, new Coordinate(1, 1));
         grid[7][2] = new Block(128, BColor.RED, new Coordinate(1, 1));
         grid[8][2] = new Block(256, BColor.RED, new Coordinate(1, 1));
+        grid[4][3] = new Block(512, BColor.RED, new Coordinate(1, 1));
+        grid[5][3] = new Block(1024, BColor.RED, new Coordinate(1, 1));
+        grid[6][3] = new Block(2048, BColor.RED, new Coordinate(1, 1));
 
 
         addObject(new Border(), 40, 245);
@@ -60,6 +66,7 @@ public class GameWorld extends World {
         // listen for key presses and act accordingly
         if (keyPresssed(Keyboard.KEY_UP)) {
             System.out.println("Up key pressed");
+            spawnBlock();
         } else if (keyPresssed(Keyboard.KEY_DOWN)) {
             System.out.println("Down key pressed");
         } else if (keyPresssed(Keyboard.KEY_LEFT)) {
@@ -98,10 +105,15 @@ public class GameWorld extends World {
         } else {
             value = 8;
         }
-        Block block = new Block(value, BColor.NEUTRAL, getRandomEmptyTile());
+        //Block block = new Block(value, BColor.BLUE, getRandomEmptyTile());
+        Coordinate g = getRandomEmptyTile();
+        grid[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE, new Coordinate());
+        renderGrid();
     }
 
     private boolean keyPresssed(int key) {
         return Mayflower.isKeyDown(key) && !Mayflower.wasKeyDown(key);
     }
+
+    
 }
