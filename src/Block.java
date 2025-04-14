@@ -39,4 +39,28 @@ public class Block extends Actor {
     public Coordinate getCoordinate() {
         return coord;
     }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public BColor getColor() {
+        return color;
+    }
+
+    public void setColor(BColor color) {
+        this.color = color;
+    }
+
+    public Coordinate getCoord() {
+        return coord;
+    }
+
+    public void setCoord(Coordinate coord) {
+        this.coord = coord;
+    }
 }

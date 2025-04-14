@@ -1,5 +1,7 @@
-## EPIC CS-III AWESOME PROJECT 7
+## PROJECT 4096
 
-Made by Connor, Nathan, David
+A multiplayer version of the popular game [2048](https://play2048.co/). 
 
-Like and subscribe
+
+
+Created by Nathan Lu, Connor Hall, David Le
