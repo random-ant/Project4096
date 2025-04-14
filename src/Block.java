@@ -1,4 +1,5 @@
 import mayflower.Actor;
+import mayflower.Color;
 import mayflower.MayflowerImage;
 import mayflower.World;
 
@@ -12,32 +13,34 @@ public class Block extends Actor {
         this.value = value;
         this.color = color;
         this.coord = coord;
-
-        if (color == BColor.NEUTRAL) {
+        
+        if (color == BColor.NEUTRAL)
+        {
             MayflowerImage img = new MayflowerImage("src/img/neutral-block.png");
             img.scale(GameWorld.BLOCK_WIDTH, GameWorld.BLOCK_HEIGHT);
             setImage(img);
         }
 
-        if (color == BColor.BLUE) {
-            MayflowerImage blue = new MayflowerImage("src/img/blue-block.png");
+        if (color == BColor.BLUE)
+        {
+            MayflowerImage blue = new MayflowerImage("src/img/blue-block" + value + ".png");
+            blue.scale(GameWorld.BLOCK_WIDTH, GameWorld.BLOCK_HEIGHT);
             setImage(blue);
         }
-
-        if (color == BColor.RED) {
-            MayflowerImage red = new MayflowerImage("src/img/red-block.png");
+        
+        if (color == BColor.RED)
+        {
+            MayflowerImage red = new MayflowerImage("src/img/red-block" + value + ".png");
             setImage(red);
         }
     }
 
     public void act() {
         World w = getWorld();
-        w.showText("" + value, getCenterX() - (GameWorld.TILE_WIDTH - GameWorld.BLOCK_WIDTH),
-                getCenterY() + (GameWorld.TILE_HEIGHT - GameWorld.BLOCK_HEIGHT));
-    }
+        
 
-    public Coordinate getCoordinate() {
-        return coord;
+        
+                     
     }
 
     public int getValue() {

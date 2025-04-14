@@ -11,14 +11,12 @@ public class GameWorld extends World {
 
     public GameWorld() {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
-        grid[0][1] = new Block(2, BColor.BLUE, new Coordinate(1, 1));
-        grid[0][2] = new Block(2, BColor.BLUE, new Coordinate(1, 1));
-        grid[0][3] = new Block(4, BColor.BLUE, new Coordinate(1, 1));
-        grid[0][4] = new Block(2, BColor.BLUE, new Coordinate(1, 1));
-        grid[0][5] = new Block(4, BColor.BLUE, new Coordinate(1, 1));
 
         addObject(new Border(), 40, 245);
         addObject(new Title(), 301, 55);
+        for (int i = 0; i < 10; i++)
+            spawnRandomBlock();
+
         renderGrid();
     }
 
@@ -40,6 +38,7 @@ public class GameWorld extends World {
 
     @Override
     public void act() {
+        int BLOCKS_SPAWNED_PER_MOVE = 10;
         // listen for key presses and act accordingly
         if (keyPresssed(Keyboard.KEY_UP)) {
             for (int j = 0; j < GRID_WIDTH; j++) {
@@ -59,6 +58,8 @@ public class GameWorld extends World {
                 }
             }
 
+            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+                spawnRandomBlock();
             renderGrid();
 
         } else if (keyPresssed(Keyboard.KEY_DOWN)) {
@@ -77,7 +78,8 @@ public class GameWorld extends World {
                     grid[i][j] = result.get(i);
                 }
             }
-
+            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+                spawnRandomBlock();
             renderGrid();
 
         } else if (keyPresssed(Keyboard.KEY_LEFT)) {
@@ -97,7 +99,8 @@ public class GameWorld extends World {
                     grid[i][j] = result.get(j);
                 }
             }
-
+            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+                spawnRandomBlock();
             renderGrid();
 
         } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
@@ -116,14 +119,16 @@ public class GameWorld extends World {
                     grid[i][j] = result.get(j);
                 }
             }
-
+            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+                spawnRandomBlock();
             renderGrid();
 
         }
 
         if (keyPresssed(Keyboard.KEY_SPACE)) {
             System.out.println("Space key pressed");
-            spawnBlock();
+            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+                spawnRandomBlock();
         }
 
     }
@@ -140,7 +145,7 @@ public class GameWorld extends World {
             currentBlock.setColor(BColor.RED);
             while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
                 Block top = stack.pop();
-                Block newBlock = new Block(top.getValue() * 2, BColor.RED, top.getCoordinate());
+                Block newBlock = new Block(top.getValue() * 2, BColor.RED, new Coordinate());
                 currentBlock = newBlock;
             }
             stack.add(currentBlock);
@@ -173,7 +178,7 @@ public class GameWorld extends World {
         return empty.get(randomIndex);
     }
 
-    public void spawnBlock() {
+    public void spawnRandomBlock() {
         double spawnValue = Math.random();
         int value;
         if (spawnValue <= 0.7) {
@@ -183,10 +188,13 @@ public class GameWorld extends World {
         } else {
             value = 8;
         }
-        Block block = new Block(value, BColor.NEUTRAL, getRandomEmptyTile());
+        // Block block = new Block(value, BColor.BLUE, getRandomEmptyTile());
+        Coordinate g = getRandomEmptyTile();
+        grid[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE, new Coordinate());
     }
 
     private boolean keyPresssed(int key) {
         return Mayflower.isKeyDown(key) && !Mayflower.wasKeyDown(key);
     }
+
 }
