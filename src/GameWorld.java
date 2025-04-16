@@ -3,7 +3,7 @@ import java.util.*;
 
 public class GameWorld extends World {
     private Block[][] grid;
-    private Map<Coordinate, Boolean> topWalls, leftWalls;
+    private Set<Coordinate> topWalls, leftWalls;
 
     public static int GRID_HEIGHT = 10, GRID_WIDTH = 10;
     public static int OFFSET_X = 45, OFFSET_Y = 250;
@@ -12,23 +12,37 @@ public class GameWorld extends World {
 
     public GameWorld() {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
-        topWalls = new HashMap<Coordinate, Boolean>();
-        leftWalls = new HashMap<Coordinate, Boolean>();
-        topWalls.put(new Coordinate(1, 1), true);
+        topWalls = new HashSet<Coordinate>();
+        leftWalls = new HashSet<Coordinate>();
 
+        addWalls();
         addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
-        for (int i = 0; i < 10; i++)
-            spawnRandomBlock();
+        spawnRandomBlocks(10);
 
         renderGrid();
     }
 
+    /**
+     * Adds walls to the grid. This method is called when the game is first created.
+     * 
+     * @return void
+     */
+    private void addWalls() {
+        topWalls.add(new Coordinate(4, 0));
+        // topWalls.add(new Coordinate(06, 0));
+    }
+
+    /**
+     * Renders the grid and all blocks in the grid to the screen
+     * 
+     * @return void
+     */
     private void renderGrid() {
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 int x_coord = (j * TILE_WIDTH) + OFFSET_X;
-                int y_coord = (i * TILE_WIDTH) + OFFSET_Y;
+                int y_coord = (i * TILE_HEIGHT) + OFFSET_Y;
 
                 // add base tiles
                 addObject(new Tile(), x_coord, y_coord);
@@ -43,18 +57,13 @@ public class GameWorld extends World {
         }
 
         // spawn walls
-        for (int i = 0; i < GRID_HEIGHT; i++) {
-            for (int j = 0; j < GRID_WIDTH; j++) {
-                int x_coord = (j * TILE_WIDTH) + OFFSET_X;
-                int y_coord = (i * TILE_WIDTH) + OFFSET_Y;
-
-                // add walls
-                Coordinate c = new Coordinate(i, j);
-                if (topWalls.containsKey(c)) {
-                    addObject(new HorizontalWall(), x_coord - 5, y_coord - 5);
-                }
-            }
+        for (Coordinate c : topWalls) {
+            int x_coord = (c.getCol() * TILE_WIDTH) + OFFSET_X;
+            int y_coord = (c.getRow() * TILE_HEIGHT) + OFFSET_Y;
+            addObject(new HorizontalWall(), x_coord - (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord - (TILE_HEIGHT
+                    - BLOCK_HEIGHT) / 2);
         }
+
     }
 
     @Override
@@ -68,7 +77,7 @@ public class GameWorld extends World {
                     col.add(grid[i][j]);
                 }
 
-                ArrayList<Block> result = check(col);
+                ArrayList<Block> result = merge(col);
                 Collections.reverse(result);
                 // add empty blocks
                 result.addAll(result.size(), Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
@@ -79,8 +88,7 @@ public class GameWorld extends World {
                 }
             }
 
-            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-                spawnRandomBlock();
+            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
             renderGrid();
 
         } else if (keyPresssed(Keyboard.KEY_DOWN)) {
@@ -90,7 +98,7 @@ public class GameWorld extends World {
                     col.add(grid[i][j]);
                 }
 
-                ArrayList<Block> result = check(col);
+                ArrayList<Block> result = merge(col);
                 // add empty blocks
                 result.addAll(0, Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
 
@@ -99,8 +107,7 @@ public class GameWorld extends World {
                     grid[i][j] = result.get(i);
                 }
             }
-            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-                spawnRandomBlock();
+            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
             renderGrid();
 
         } else if (keyPresssed(Keyboard.KEY_LEFT)) {
@@ -110,7 +117,7 @@ public class GameWorld extends World {
                     row.add(grid[i][j]);
                 }
 
-                ArrayList<Block> result = check(row);
+                ArrayList<Block> result = merge(row);
                 Collections.reverse(result);
                 // add empty blocks
                 result.addAll(result.size(), Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
@@ -120,8 +127,7 @@ public class GameWorld extends World {
                     grid[i][j] = result.get(j);
                 }
             }
-            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-                spawnRandomBlock();
+            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
             renderGrid();
 
         } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
@@ -131,7 +137,7 @@ public class GameWorld extends World {
                     row.add(grid[i][j]);
                 }
 
-                ArrayList<Block> result = check(row);
+                ArrayList<Block> result = merge(row);
                 // add empty blocks
                 result.addAll(0, Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
 
@@ -140,8 +146,7 @@ public class GameWorld extends World {
                     grid[i][j] = result.get(j);
                 }
             }
-            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-                spawnRandomBlock();
+            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
             renderGrid();
 
         }
@@ -149,13 +154,13 @@ public class GameWorld extends World {
         if (keyPresssed(Keyboard.KEY_SPACE)) {
             System.out.println("Space key pressed");
             for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-                spawnRandomBlock();
+                spawnRandomBlocks(10);
         }
 
     }
 
     // Get list of arrays
-    public ArrayList<Block> check(ArrayList<Block> blocks) {
+    public ArrayList<Block> merge(ArrayList<Block> blocks) {
         Stack<Block> stack = new Stack<Block>();
 
         for (Block b : blocks) {
@@ -192,14 +197,7 @@ public class GameWorld extends World {
         return out;
     }
 
-    public Coordinate getRandomEmptyTile() {
-        ArrayList<Coordinate> empty = getEmptyTiles();
-        int numEmpty = empty.size();
-        int randomIndex = (int) (Math.random() * numEmpty);
-        return empty.get(randomIndex);
-    }
-
-    public void spawnRandomBlock() {
+    public void spawnRandomBlocks(int numBlocks) {
         double spawnValue = Math.random();
         int value;
         if (spawnValue <= 0.7) // 70% chance
@@ -209,8 +207,12 @@ public class GameWorld extends World {
         else // 10% chance
             value = 8;
 
-        Coordinate g = getRandomEmptyTile();
-        grid[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE);
+        ArrayList<Coordinate> empty = getEmptyTiles();
+        Collections.shuffle(empty);
+        for (int i = 0; i < numBlocks && i < empty.size(); i++) {
+            Coordinate g = empty.get(i);
+            grid[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE);
+        }
     }
 
     /**
