@@ -8,15 +8,19 @@ public class Block extends Actor {
     private int value;
     private BColor color;
     private Coordinate coord;
+    private double x;
+    private double y;
 
     public Block(int value, BColor color, Coordinate coord) {
         this.value = value;
         this.color = color;
         this.coord = coord;
         
+        
+
         if (color == BColor.NEUTRAL)
         {
-            MayflowerImage img = new MayflowerImage("src/img/neutral-block.png");
+            MayflowerImage img = new MayflowerImage("src/img/neutral-block" + value + ".png");
             img.scale(GameWorld.BLOCK_WIDTH, GameWorld.BLOCK_HEIGHT);
             setImage(img);
         }
@@ -66,4 +70,5 @@ public class Block extends Actor {
     public void setCoord(Coordinate coord) {
         this.coord = coord;
     }
+
 }
