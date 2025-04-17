@@ -7,14 +7,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-public class TicTacToeServer extends Server {
+public class GameServer extends Server {
 	private Queue<Integer> clientsWaitingForGame;
 	private Map<Integer, Game> games;
 	private Map<Integer, Integer> otherPlayer;
 	private Set<Integer> blueClients, redClients;
 
-	public TicTacToeServer(int port) {
-		super(port);
+	public GameServer(int port) {
+		super(port, true);
 
 		clientsWaitingForGame = new LinkedList<Integer>();
 		games = new HashMap<Integer, Game>();
@@ -23,6 +23,7 @@ public class TicTacToeServer extends Server {
 		redClients = new HashSet<Integer>();
 
 		System.out.println("Waiting for clients on port " + getPort() + " at " + getIP());
+	
 	}
 
 	/*
@@ -47,41 +48,53 @@ public class TicTacToeServer extends Server {
 			if (curr == player) {
 				// parse the row and col from the message
 				String[] parts = message.trim().split(" ");
-				if (parts.length >= 3) {
+				if ("addblock".equals(parts[0]) || "move".equals(parts[0])) {
 					try {
 						// Integer.parseInt() can throw an exception
-						int row = Integer.parseInt(parts[1]);
-						int col = Integer.parseInt(parts[2]);
+						if ("addblock".equals(parts[0])) {
+							int row = Integer.parseInt(parts[1]);
+							int col = Integer.parseInt(parts[2]);
+							int val = Integer.parseInt(parts[3]);
 
-						// check if a piece can be placed at (row, col)
-						if (null == game.getBlock(row, col)) {
+							// check if a piece can be placed at (row, col)
+							if (null == game.getBlock(row, col)) {
 
-							// FIX FIX
+								// FIX FIX
 
-							double spawnValue = Math.random();
-							int value;
-							if (spawnValue <= 0.7) {
-								value = 2;
-							} else if (spawnValue <= 0.9) {
-								value = 4;
+								game.addBlock(row, col, val, BColor.NEUTRAL);
+
+								// broadcast this move to both clients in this game
+								String response = "addblock " + row + " " + col + " " + val;
+								send(id, response);
+								send(otherPlayer.get(id), response);
+
+								// check if game is over
+								// if it is, remove the game and clients from memory
+								if (game.isGameOver()) {
+									endGame(id, otherPlayer.get(id));
+								}
 							} else {
-								value = 8;
+								send(id, "error location is occupied: [" + message + "]");
 							}
-							game.addBlock(row, col, value, BColor.NEUTRAL);
+						} if ("move".equals(parts[0])) {
+							String dir = parts[1];
+							if ("UP".equals(dir)) {
+								game.merge(Direction.UP);
+							} else if ("DOWN".equals(dir)) {
+								game.merge(Direction.DOWN);
+							} else if ("LEFT".equals(dir)) {
+								game.merge(Direction.LEFT);
+							} else if ("RIGHT".equals(dir)) {
+								game.merge(Direction.RIGHT);
+							}
 							game.nextPlayer();
 
-							// broadcast this move to both clients in this game
-							String response = "addpiece " + row + " " + col;
+							// render grid???
+
+							// response
+							String response = "move " + dir;
 							send(id, response);
 							send(otherPlayer.get(id), response);
-
-							// check if game is over
-							// if it is, remove the game and clients from memory
-							if (game.isGameOver()) {
-								endGame(id, otherPlayer.get(id));
-							}
-						} else {
-							send(id, "error location is occupied: [" + message + "]");
 						}
 					} catch (Exception e) {
 						send(id, "error invalid request: [" + message + "]");
@@ -122,28 +135,28 @@ public class TicTacToeServer extends Server {
 			otherPlayer.put(clientB, clientA);
 
 			// create TicTacToe game and mapping from clients -> game
-			TicTacToe game = new TicTacToe();
+			Game game = new Game();
 			games.put(clientA, game);
 			games.put(clientB, game);
 
-			// flip a coin to pick which client is X and which is O
-			// store each client in the appropriate Set (xClients, oClients)
-			// send message to each client informing them of their piece (X, O)
+			// flip a coin to pick which client is BLUE and which is RED
+			// store each client in the appropriate Set (blueClients, redClients)
+			// send message to each client informing them of their color (BLUE, RED)
 			// This message also lets the client's know that their game is ready to be
 			// played
 			int r = (int) (Math.random() * 2);
 			if (r == 0) {
-				xClients.add(clientA);
-				oClients.add(clientB);
+				blueClients.add(clientA);
+				redClients.add(clientB);
 
-				send(clientA, "youare X");
-				send(clientB, "youare O");
+				send(clientA, "youare BLUE");
+				send(clientB, "youare RED");
 			} else {
-				xClients.add(clientB);
-				oClients.add(clientA);
+				blueClients.add(clientB);
+				redClients.add(clientA);
 
-				send(clientB, "youare X");
-				send(clientA, "youare O");
+				send(clientB, "youare BLUE");
+				send(clientA, "youare RED");
 			}
 		}
 	}
@@ -161,7 +174,7 @@ public class TicTacToeServer extends Server {
 		}
 
 		// check if this player is already in a game
-		TicTacToe game = games.get(id);
+		Game game = games.get(id);
 		if (game != null) {
 			// tell the other player that they win!
 			send(otherPlayer.get(id), "winner disconnect");
@@ -183,10 +196,10 @@ public class TicTacToeServer extends Server {
 		games.remove(clientA);
 		games.remove(clientB);
 
-		xClients.remove(clientA);
-		xClients.remove(clientB);
+		blueClients.remove(clientA);
+		blueClients.remove(clientB);
 
-		oClients.remove(clientA);
-		oClients.remove(clientB);
+		redClients.remove(clientA);
+		redClients.remove(clientB);
 	}
 }
