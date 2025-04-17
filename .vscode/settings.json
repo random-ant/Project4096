@@ -4,5 +4,10 @@
   "java.project.referencedLibraries": ["lib/**/*.jar", "mayflower3.3.7.jar"],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnPaste": true,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java"
+  },
+  "files.autoSave": "afterDelay",
+  "files.autoSaveWhenNoErrors": true
 }

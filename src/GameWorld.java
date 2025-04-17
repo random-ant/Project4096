@@ -3,28 +3,61 @@ import java.util.*;
 
 public class GameWorld extends World {
     private Block[][] grid;
+
+    /**
+     * The walls of the grid. The location of the walls is stored as a coordinate of
+     * the block it is relative to.
+     */
     private Set<Coordinate> topWalls, leftWalls;
 
+    /**
+     * The dimensions (in tiles) of the grid
+     */
     public static int GRID_HEIGHT = 10, GRID_WIDTH = 10;
     public static int OFFSET_X = 45, OFFSET_Y = 250;
+
+    /**
+     * The dimensions (in pixels) of the tiles (each square in the grid)
+     */
     public static int TILE_WIDTH = 70, TILE_HEIGHT = 70;
+
+    /**
+     * The dimensions (in pixels) of the blocks (tiles without the borders)
+     */
     public static int BLOCK_WIDTH = 60, BLOCK_HEIGHT = 60;
+
+    private TurnGraphic turnGraph;
+    private int RED_SCORE = 0;
+    private int BLUE_SCORE = 0;
+
+    /**
+     * Which players turn it is.
+     * 
+     * If FALSE, then it is BLUE's turn. If TRUE, then it
+     * is RED's turn.
+     */
+    public static boolean turn;
 
     public GameWorld() {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
         topWalls = new HashSet<Coordinate>();
         leftWalls = new HashSet<Coordinate>();
+        turn = true; // blue goes first
 
         addWalls();
+        // addObject(new Title(), 20, 20);
         addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
-        spawnRandomBlocks(10);
+        turnGraph = new TurnGraphic(turn);
+        addObject(turnGraph, 40, 55);
 
+        spawnRandomBlocks(10);
         renderGrid();
     }
 
     /**
-     * Adds walls to the grid. This method is called when the game is first created.
+     * Adds walls to the grid. This method should be called when the game world is
+     * first created.
      * 
      * @return void
      */
@@ -34,9 +67,8 @@ public class GameWorld extends World {
     }
 
     /**
-     * Renders the grid and all blocks in the grid to the screen
-     * 
-     * @return void
+     * Renders the grid. Inclues all tiles, blocks, walls in the grid, plus the
+     * score text. Should be called whenever game state is changed.
      */
     private void renderGrid() {
         for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -72,11 +104,25 @@ public class GameWorld extends World {
                     - BLOCK_HEIGHT) / 2);
         }
 
+        // update score text
+        showText("score blue: " + BLUE_SCORE, 550, 55, Color.BLACK);
+        showText("score red: " + RED_SCORE, 550, 110, Color.BLACK);
+    }
+
+    /**
+     * Swaps who can make a move. Updates turn graphic accordingly.
+     * 
+     * @return void
+     */
+    private void swapActivePlayer() {
+        turn = !turn;
+        turnGraph.setTurn(turn);
     }
 
     @Override
     public void act() {
-        int BLOCKS_SPAWNED_PER_MOVE = 10;
+        int BLOCKS_SPAWNED_PER_MOVE = 3;
+
         // listen for key presses and act accordingly
         if (keyPresssed(Keyboard.KEY_UP)) {
             for (int j = 0; j < GRID_WIDTH; j++) {
@@ -109,6 +155,7 @@ public class GameWorld extends World {
 
             spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
             renderGrid();
+            swapActivePlayer();
 
         } else if (keyPresssed(Keyboard.KEY_DOWN)) {
             for (int j = 0; j < GRID_WIDTH; j++) {
@@ -137,8 +184,10 @@ public class GameWorld extends World {
                     grid[i][j] = result.get(i);
                 }
             }
+
             spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
             renderGrid();
+            swapActivePlayer();
 
         } else if (keyPresssed(Keyboard.KEY_LEFT)) {
             for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -167,6 +216,7 @@ public class GameWorld extends World {
 
             spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
             renderGrid();
+            swapActivePlayer();
 
         } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
             for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -194,25 +244,22 @@ public class GameWorld extends World {
                     grid[i][j] = result.get(j);
                 }
             }
+
             spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
             renderGrid();
+            swapActivePlayer();
 
         }
-
-        if (keyPresssed(Keyboard.KEY_SPACE)) {
-            System.out.println("Space key pressed");
-            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-                spawnRandomBlocks(10);
-        }
-
     }
 
     /**
      * Merges blocks in the given array. The blocks are merged from left to right.
      * Elements will always be merged to the largest possible element.
      * 
-     * @param blocks
-     * @return the merged blocks
+     * @param blocks The line of blocks to merge. Any {@code null} values are
+     *               considered empty tiles.
+     * @return An {@code ArrayList} of merged blocks. All empty blocks will have
+     *         been removed.
      */
     public ArrayList<Block> merge(ArrayList<Block> blocks) {
         Stack<Block> stack = new Stack<Block>();
@@ -225,10 +272,22 @@ public class GameWorld extends World {
             currentBlock.setColor(BColor.RED);
             while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
                 Block top = stack.pop();
-                Block newBlock = new Block(top.getValue() * 2, BColor.RED);
+                int newValue = top.getValue() * 2;
+                BColor newColor;
+
+                if (turn) { // if BLUE's turn
+                    newColor = BColor.BLUE;
+                    BLUE_SCORE += newValue;
+                } else {
+                    newColor = BColor.RED;
+                    RED_SCORE += newValue;
+                }
+
+                Block newBlock = new Block(newValue, newColor);
                 currentBlock = newBlock;
             }
             stack.add(currentBlock);
+
         }
 
         ArrayList<Block> result = new ArrayList<Block>();
@@ -240,7 +299,7 @@ public class GameWorld extends World {
         return result;
     }
 
-    public ArrayList<Coordinate> getEmptyTiles() {
+    private ArrayList<Coordinate> getEmptyTiles() {
         ArrayList<Coordinate> out = new ArrayList<Coordinate>(GRID_HEIGHT * GRID_WIDTH);
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
@@ -252,6 +311,13 @@ public class GameWorld extends World {
         return out;
     }
 
+    /**
+     * Spawn a certain amount of blocks into the grid. Blocks will be randomly
+     * placed into empty tiles. If there are no more empty tiles, nothing will
+     * happen.
+     * 
+     * @param numBlocks number of blocks to spawn in
+     */
     public void spawnRandomBlocks(int numBlocks) {
         double spawnValue = Math.random();
         int value = -1;
@@ -266,15 +332,17 @@ public class GameWorld extends World {
         Collections.shuffle(empty);
         for (int i = 0; i < numBlocks && i < empty.size(); i++) {
             Coordinate g = empty.get(i);
-            grid[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE);
+            grid[g.getRow()][g.getCol()] = new Block(value, BColor.NEUTRAL);
         }
     }
 
     /**
      * Returns whether or not a key was newly pressed down on this frame
      * 
-     * @param key a KEYBOARD constant that represents which key to check for
-     * @return true if the key was newly pressed down on the frame, false otherwise
+     * @param key A {@code Mayflower.KEYBOARD} constant that represents which key to
+     *            check for
+     * @return {@code true} if the key was newly pressed down on the frame,
+     *         {@code false} otherwise
      */
     private boolean keyPresssed(int key) {
         return Mayflower.isKeyDown(key) && !Mayflower.wasKeyDown(key);
