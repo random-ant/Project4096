@@ -126,8 +126,8 @@ public class GameServer extends Server {
 		// If there are at least 2 clients waiting for a game...
 		if (clientsWaitingForGame.size() >= 2) {
 			// get the two clients that have been waiting the longest
-			int clientA = clientsWaitingForGame.remove();
-			int clientB = clientsWaitingForGame.remove();
+			Integer clientA = clientsWaitingForGame.remove();
+			Integer clientB = clientsWaitingForGame.remove();
 
 			// create a mapping between each of they players so that you can always find the
 			// *other* player

@@ -14,8 +14,7 @@ public class Game {
         this.grid = new Block[GRID_HEIGHT][GRID_WIDTH];
         this.currentPlayer = BColor.BLUE;
 
-        for (int i = 0; i < 10; i++)
-            spawnRandomBlock();
+        
     }
 
     public Game copy() {

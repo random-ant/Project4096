@@ -8,17 +8,19 @@ public class GameClient extends Client {
     private Game game;
 
     public GameClient() {
-        Scanner in = new Scanner(System.in);
-        System.out.println("Use localhost to connect to a server running on your computer.");
-        System.out.print("IP Address > ");
-        String ip = in.next();
+        // Scanner in = new Scanner(System.in);
+        // System.out.println("Use localhost to connect to a server running on your computer.");
+        // System.out.print("IP Address > ");
+        // String ip = in.next();
 
         // System.out.print("Port > ");
         // int port = in.nextInt();
         int port = 1234; // default server port
 
         System.out.println("Connecting...");
-        connect(ip, port);
+        // connect(ip, port);
+        connect("localhost", port);
+
     }
 
     public void process(String message) {
@@ -37,7 +39,10 @@ public class GameClient extends Client {
 
             world = new GameWorld(this, game, player);
 
-            new MyMayflower("game", 800, 100, world);
+            new MyMayflower("game", 800, 1000, world);
+
+            world.renderGrid();
+
         } else if ("move".equals(parts[0])) {
             String dir = parts[1];
             if ("UP".equals(dir)) {
