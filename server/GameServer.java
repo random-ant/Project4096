@@ -23,7 +23,7 @@ public class GameServer extends Server {
 		redClients = new HashSet<Integer>();
 
 		System.out.println("Waiting for clients on port " + getPort() + " at " + getIP());
-	
+
 	}
 
 	/*
@@ -41,7 +41,7 @@ public class GameServer extends Server {
 		Game game = games.get(id);
 
 		// check if client is in a game and if that game is not over
-		if (game != null && !game.isGameOver()) {
+		if (game != null) {
 			// check if it is this players turn
 			BColor player = blueClients.contains(id) ? BColor.BLUE : BColor.RED;
 			BColor curr = game.getCurrentPlayer();
@@ -68,15 +68,11 @@ public class GameServer extends Server {
 								send(id, response);
 								send(otherPlayer.get(id), response);
 
-								// check if game is over
-								// if it is, remove the game and clients from memory
-								if (game.isGameOver()) {
-									endGame(id, otherPlayer.get(id));
-								}
 							} else {
 								send(id, "error location is occupied: [" + message + "]");
 							}
-						} if ("move".equals(parts[0])) {
+						}
+						if ("move".equals(parts[0])) {
 							String dir = parts[1];
 							if ("UP".equals(dir)) {
 								game.merge(Direction.UP);

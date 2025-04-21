@@ -18,13 +18,13 @@ public class GameWorld extends World {
         this.game = game;
         game.setClient(client);
 
-        addObject(new Border(), 40, 245);
-        addObject(new Title(), 301, 55);
-
         renderGrid();
     }
 
     public void renderGrid() {
+        addObject(new Border(), 40, 245);
+        addObject(new Title(), 301, 55);
+
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 int x_coord = (j * TILE_WIDTH) + OFFSET_X;
@@ -54,6 +54,11 @@ public class GameWorld extends World {
         } else if (keyPressed(Keyboard.KEY_RIGHT)) {
             game.merge(Direction.RIGHT);
             renderGrid();
+        }
+
+        if (keyPressed(Keyboard.KEY_SPACE)) {
+            renderGrid();
+            System.out.println("render");
         }
 
     }

@@ -13,7 +13,7 @@ public class MyMayflower extends Mayflower {
 
    public void init() {
       Mayflower.setFullScreen(false);
-      setWorld(world);
+      Mayflower.setWorld(this.world);
    }
 
 }
