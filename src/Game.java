@@ -1,20 +1,17 @@
 import java.util.ArrayList;
 import java.util.*;
 
-import mayflower.*;
-
 public class Game {
     int GRID_WIDTH = 10;
     int GRID_HEIGHT = 10;
     Block[][] grid;
     BColor currentPlayer;
+    BColor myColor;
     GameClient client;
 
     public Game() {
         this.grid = new Block[GRID_HEIGHT][GRID_WIDTH];
         this.currentPlayer = BColor.BLUE;
-
-        
     }
 
     public Game copy() {
@@ -26,6 +23,14 @@ public class Game {
         }
         copy.setCurrentPlayer(this.currentPlayer);
         return copy;
+    }
+
+    public BColor getMyColor() {
+        return myColor;
+    }
+
+    public void setMyColor(BColor color) {
+        myColor = color;
     }
 
     public BColor getCurrentPlayer() {

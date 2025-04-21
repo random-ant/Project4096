@@ -154,6 +154,11 @@ public class GameServer extends Server {
 				send(clientB, "youare BLUE");
 				send(clientA, "youare RED");
 			}
+
+			game.addBlock(1, 1, 2);
+			send(clientA, "addblock 1 1 2");
+			send(clientB, "addblock 1 1 2");
+
 		}
 	}
 

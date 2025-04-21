@@ -4,6 +4,7 @@ import java.util.*;
 public class GameWorld extends World {
     private Game game;
     private BColor color;
+    private BColor currentColor;
     private Block[][] blocks;
 
     public static int GRID_HEIGHT = 10, GRID_WIDTH = 10;
@@ -11,8 +12,9 @@ public class GameWorld extends World {
     public static int TILE_WIDTH = 70, TILE_HEIGHT = 70;
     public static int BLOCK_WIDTH = 60, BLOCK_HEIGHT = 60;
 
-    public GameWorld(GameClient client, Game game, BColor color) {
-        this.color = color;
+    public GameWorld(GameClient client, Game game) {
+        this.color = game.getMyColor();
+        this.currentColor = game.getCurrentPlayer();
         blocks = new Block[GRID_HEIGHT][GRID_WIDTH];
 
         this.game = game;
@@ -42,23 +44,20 @@ public class GameWorld extends World {
 
     @Override
     public void act() {
-        if (keyPressed(Keyboard.KEY_UP)) {
-            game.merge(Direction.UP);
-            renderGrid();
-        } else if (keyPressed(Keyboard.KEY_DOWN)) {
-            game.merge(Direction.DOWN);
-            renderGrid();
-        } else if (keyPressed(Keyboard.KEY_LEFT)) {
-            game.merge(Direction.LEFT);
-            renderGrid();
-        } else if (keyPressed(Keyboard.KEY_RIGHT)) {
-            game.merge(Direction.RIGHT);
-            renderGrid();
-        }
-
-        if (keyPressed(Keyboard.KEY_SPACE)) {
-            renderGrid();
-            System.out.println("render");
+        if (color == currentColor) {
+            if (keyPressed(Keyboard.KEY_U)) {
+                game.merge(Direction.UP);
+                renderGrid();
+            } else if (keyPressed(Keyboard.KEY_DOWN)) {
+                game.merge(Direction.DOWN);
+                renderGrid();
+            } else if (keyPressed(Keyboard.KEY_LEFT)) {
+                game.merge(Direction.LEFT);
+                renderGrid();
+            } else if (keyPressed(Keyboard.KEY_RIGHT)) {
+                game.merge(Direction.RIGHT);
+                renderGrid();
+            }
         }
 
     }
@@ -70,6 +69,18 @@ public class GameWorld extends World {
     public void updateBlock(BColor color, int row, int col, int value) {
         blocks[row][col].setColor(color);
         blocks[row][col].setValue(value);
+    }
+
+    public BColor getCurrentColor() {
+        return currentColor;
+    }
+
+    public void nextPlayer() {
+        if (this.currentColor == BColor.BLUE) {
+            this.currentColor = BColor.RED;
+        } else if (this.currentColor == BColor.RED) {
+            this.currentColor = BColor.BLUE;
+        }
     }
 
 }

@@ -1,6 +1,5 @@
 import java.util.Scanner;
 
-import mayflower.*;
 import mayflower.net.*;
 
 public class GameClient extends Client {
@@ -21,6 +20,7 @@ public class GameClient extends Client {
         connect(ip, port);
         // connect("localhost", port);
 
+        in.close();
     }
 
     public void process(String message) {
@@ -36,8 +36,9 @@ public class GameClient extends Client {
             BColor player = "BLUE".equals(parts[1]) ? BColor.BLUE : BColor.RED;
 
             game = new Game();
+            game.setMyColor(player);
 
-            world = new GameWorld(this, game, player);
+            world = new GameWorld(this, game);
 
             new MyMayflower("game", 800, 1000, world);
 
