@@ -2,7 +2,7 @@ import mayflower.*;
 import java.util.*;
 
 public class GameWorld extends World {
-    private Block[][] grid;
+    private MovableItem[][] grid;
 
     /**
      * The walls of the grid. The location of the walls is stored as a coordinate of
@@ -39,19 +39,20 @@ public class GameWorld extends World {
     public static boolean turn;
 
     public GameWorld() {
-        grid = new Block[GRID_HEIGHT][GRID_WIDTH];
+        grid = new MovableItem[GRID_HEIGHT][GRID_WIDTH];
         topWalls = new HashSet<Coordinate>();
         leftWalls = new HashSet<Coordinate>();
         turn = true; // blue goes first
 
         addWalls();
-        // addObject(new Title(), 20, 20);
         addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
         turnGraph = new TurnGraphic(turn);
         addObject(turnGraph, 40, 55);
 
+        grid[5][5] = new Powerup();
         spawnRandomBlocks(10);
+
         renderGrid();
     }
 
@@ -80,7 +81,7 @@ public class GameWorld extends World {
                 addObject(new Tile(), x_coord, y_coord);
 
                 // add blocks
-                Block currBlock = grid[i][j];
+                MovableItem currBlock = grid[i][j];
                 if (currBlock != null) {
                     addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2,
                             y_coord + (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
@@ -110,7 +111,7 @@ public class GameWorld extends World {
     }
 
     /**
-     * Swaps who can make a move. Updates turn graphic accordingly.
+     * Swaps who can make a move. Updates turn and turn graphic accordingly.
      * 
      * @return void
      */
@@ -126,17 +127,17 @@ public class GameWorld extends World {
         // listen for key presses and act accordingly
         if (keyPresssed(Keyboard.KEY_UP)) {
             for (int j = 0; j < GRID_WIDTH; j++) {
-                ArrayList<Block> col = new ArrayList<Block>();
-                ArrayList<Block> result = new ArrayList<Block>();
+                ArrayList<MovableItem> col = new ArrayList<MovableItem>();
+                ArrayList<MovableItem> result = new ArrayList<MovableItem>();
 
                 for (int i = 0; i <= GRID_HEIGHT; i++) {
                     // when there's a wall, merge what we already have
                     if (topWalls.contains(new Coordinate(i, j)) || i == GRID_HEIGHT) {
-                        ArrayList<Block> toAdd = merge(col);
+                        ArrayList<MovableItem> toAdd = merge(col);
                         result.addAll(toAdd);
 
                         // add empty blocks
-                        result.addAll(Arrays.asList(new Block[i - result.size()]));
+                        result.addAll(Arrays.asList(new MovableItem[i - result.size()]));
 
                         col.clear();
 
@@ -159,8 +160,8 @@ public class GameWorld extends World {
 
         } else if (keyPresssed(Keyboard.KEY_DOWN)) {
             for (int j = 0; j < GRID_WIDTH; j++) {
-                ArrayList<Block> col = new ArrayList<Block>();
-                ArrayList<Block> result = new ArrayList<Block>();
+                ArrayList<MovableItem> col = new ArrayList<MovableItem>();
+                ArrayList<MovableItem> result = new ArrayList<MovableItem>();
 
                 for (int i = GRID_HEIGHT - 1; i >= 0; i--) {
                     if (grid[i][j] != null) {
@@ -168,10 +169,10 @@ public class GameWorld extends World {
                     }
 
                     if (topWalls.contains(new Coordinate(i, j)) || i == 0) {
-                        ArrayList<Block> toAdd = merge(col);
+                        ArrayList<MovableItem> toAdd = merge(col);
                         // add empty blocks
                         result.addAll(toAdd);
-                        result.addAll(Arrays.asList(new Block[GRID_HEIGHT - i - result.size()]));
+                        result.addAll(Arrays.asList(new MovableItem[GRID_HEIGHT - i - result.size()]));
 
                         col.clear();
                     }
@@ -191,15 +192,15 @@ public class GameWorld extends World {
 
         } else if (keyPresssed(Keyboard.KEY_LEFT)) {
             for (int i = 0; i < GRID_HEIGHT; i++) {
-                ArrayList<Block> row = new ArrayList<Block>();
-                ArrayList<Block> result = new ArrayList<Block>();
+                ArrayList<MovableItem> row = new ArrayList<MovableItem>();
+                ArrayList<MovableItem> result = new ArrayList<MovableItem>();
 
                 for (int j = 0; j <= GRID_WIDTH; j++) {
                     if (leftWalls.contains(new Coordinate(i, j)) || j == GRID_WIDTH) {
-                        ArrayList<Block> toAdd = merge(row);
+                        ArrayList<MovableItem> toAdd = merge(row);
                         result.addAll(toAdd);
                         // add empty blocks
-                        result.addAll(Arrays.asList(new Block[j - result.size()]));
+                        result.addAll(Arrays.asList(new MovableItem[j - result.size()]));
                         row.clear();
                     }
 
@@ -220,8 +221,8 @@ public class GameWorld extends World {
 
         } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
             for (int i = 0; i < GRID_HEIGHT; i++) {
-                ArrayList<Block> row = new ArrayList<Block>();
-                ArrayList<Block> result = new ArrayList<Block>();
+                ArrayList<MovableItem> row = new ArrayList<MovableItem>();
+                ArrayList<MovableItem> result = new ArrayList<MovableItem>();
 
                 for (int j = GRID_WIDTH - 1; j >= 0; j--) {
                     if (grid[i][j] != null) {
@@ -229,10 +230,10 @@ public class GameWorld extends World {
                     }
 
                     if (leftWalls.contains(new Coordinate(i, j)) || j == 0) {
-                        ArrayList<Block> toAdd = merge(row);
+                        ArrayList<MovableItem> toAdd = merge(row);
                         result.addAll(toAdd);
                         // add empty blocks
-                        result.addAll(Arrays.asList(new Block[GRID_WIDTH - j - result.size()]));
+                        result.addAll(Arrays.asList(new MovableItem[GRID_WIDTH - j - result.size()]));
                         row.clear();
                     }
                 }
@@ -261,17 +262,20 @@ public class GameWorld extends World {
      * @return An {@code ArrayList} of merged blocks. All empty blocks will have
      *         been removed.
      */
-    public ArrayList<Block> merge(ArrayList<Block> blocks) {
-        Stack<Block> stack = new Stack<Block>();
+    public ArrayList<MovableItem> merge(ArrayList<MovableItem> blocks) {
+        Stack<MovableItem> stack = new Stack<MovableItem>();
 
-        for (Block b : blocks) {
-            Block currentBlock = b;
-            if (currentBlock == null)
+        for (MovableItem b : blocks) {
+            if (b == null || (b instanceof Powerup))
                 continue;
+            if (b instanceof Powerup) {
 
+            }
+
+            Block currentBlock = (Block) b;
             currentBlock.setColor(BColor.RED);
-            while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
-                Block top = stack.pop();
+            while (!stack.empty() && ((Block) stack.peek()).getValue() == currentBlock.getValue()) {
+                Block top = (Block) stack.pop();
                 int newValue = top.getValue() * 2;
                 BColor newColor;
 
@@ -290,7 +294,7 @@ public class GameWorld extends World {
 
         }
 
-        ArrayList<Block> result = new ArrayList<Block>();
+        ArrayList<MovableItem> result = new ArrayList<MovableItem>();
         // add stack elements to result array
         while (!stack.empty())
             result.add(stack.pop());

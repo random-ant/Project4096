@@ -1,7 +1,6 @@
-import mayflower.Actor;
-import mayflower.MayflowerImage;
+import mayflower.*;
 
-public class Block extends Actor {
+public class Block extends MovableItem {
 
     private int value;
     private BColor color;
