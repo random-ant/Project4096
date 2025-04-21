@@ -7,20 +7,21 @@ public class GameClient extends Client {
     private Game game;
 
     public GameClient() {
-        Scanner in = new Scanner(System.in);
-        System.out.println("Use localhost to connect to a server running on your computer.");
-        System.out.print("IP Address > ");
-        String ip = in.next();
+        // Scanner in = new Scanner(System.in);
+        // System.out.println("Use localhost to connect to a server running on your
+        // computer.");
+        // System.out.print("IP Address > ");
+        // String ip = in.next();
 
         // System.out.print("Port > ");
         // int port = in.nextInt();
         int port = 1234; // default server port
 
-        System.out.println("Connecting...");
-        connect(ip, port);
-        // connect("localhost", port);
+        // System.out.println("Connecting...");
+        // connect(ip, port);
+        connect("localhost", port);
 
-        in.close();
+        // in.close();
     }
 
     public void process(String message) {
@@ -36,6 +37,7 @@ public class GameClient extends Client {
             BColor player = "BLUE".equals(parts[1]) ? BColor.BLUE : BColor.RED;
 
             game = new Game();
+            game.setClient(this);
             game.setMyColor(player);
 
             world = new GameWorld(this, game);
@@ -45,7 +47,7 @@ public class GameClient extends Client {
             world.renderGrid();
 
         } else if ("move".equals(parts[0])) {
-            System.out.println("move" + parts[1]);
+            System.out.println("move " + parts[1]);
             String dir = parts[1];
             if ("UP".equals(dir)) {
                 game.merge(Direction.UP);
@@ -57,12 +59,17 @@ public class GameClient extends Client {
                 game.merge(Direction.RIGHT);
             }
             game.nextPlayer();
+            world.nextPlayer();
             world.renderGrid();
         } else if ("addblock".equals(parts[0])) {
             int row = Integer.parseInt(parts[1]);
             int col = Integer.parseInt(parts[2]);
             int val = Integer.parseInt(parts[3]);
-            game.addBlock(row, col, val, BColor.NEUTRAL);
+            if (game.getBlock(row, col) == null) {
+                game.addBlock(row, col, val, BColor.BLUE);
+            }
+        } else if ("render".equals(parts[0])) {
+            world.renderGrid();
         } else if ("error".equals(parts[0])) {
             System.out.println(message);
         } else if ("winner".equals(parts[0])) {

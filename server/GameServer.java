@@ -94,9 +94,11 @@ public class GameServer extends Server {
 						}
 					} catch (Exception e) {
 						send(id, "error invalid request: [" + message + "]");
+						e.printStackTrace();
 					}
 				} else {
 					send(id, "error invalid request: [" + message + "]");
+					System.out.println(parts);
 				}
 			} else {
 				send(id, "error not your turn");
@@ -155,9 +157,11 @@ public class GameServer extends Server {
 				send(clientA, "youare RED");
 			}
 
-			game.addBlock(1, 1, 2);
+			game.addBlock(1, 1, 2, BColor.BLUE);
 			send(clientA, "addblock 1 1 2");
 			send(clientB, "addblock 1 1 2");
+			send(clientA, "render");
+			send(clientB, "render");
 
 		}
 	}

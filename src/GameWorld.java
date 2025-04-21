@@ -21,6 +21,8 @@ public class GameWorld extends World {
         game.setClient(client);
 
         renderGrid();
+
+        showText(color.toString(), 100, 100);
     }
 
     public void renderGrid() {
@@ -35,8 +37,10 @@ public class GameWorld extends World {
 
                 Block currBlock = game.getGrid()[i][j];
                 if (currBlock != null) {
-                    addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2,
-                            y_coord + (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
+                    System.out.println("idk");
+                    addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord +
+                            (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
+                    // addObject(currBlock, 200, 200);
                 }
             }
         }
@@ -45,9 +49,10 @@ public class GameWorld extends World {
     @Override
     public void act() {
         if (color == currentColor) {
-            if (keyPressed(Keyboard.KEY_U)) {
+            if (keyPressed(Keyboard.KEY_UP)) {
                 game.merge(Direction.UP);
                 renderGrid();
+                System.out.println("HERE");
             } else if (keyPressed(Keyboard.KEY_DOWN)) {
                 game.merge(Direction.DOWN);
                 renderGrid();

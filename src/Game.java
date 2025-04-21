@@ -119,8 +119,8 @@ public class Game {
                 }
             }
 
-            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-                spawnRandomBlock();
+            // for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+            spawnRandomBlock();
 
         } else if (dir == Direction.DOWN) {
             for (int j = 0; j < GRID_WIDTH; j++) {
@@ -138,8 +138,8 @@ public class Game {
                     grid[i][j] = result.get(i);
                 }
             }
-            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-                spawnRandomBlock();
+            // for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+            spawnRandomBlock();
 
         } else if (dir == Direction.LEFT) {
             for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -158,8 +158,8 @@ public class Game {
                     grid[i][j] = result.get(j);
                 }
             }
-            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-                spawnRandomBlock();
+            // for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+            spawnRandomBlock();
 
         } else if (dir == Direction.RIGHT) {
             for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -177,9 +177,8 @@ public class Game {
                     grid[i][j] = result.get(j);
                 }
             }
-            for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-                spawnRandomBlock();
-
+            // for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+            spawnRandomBlock();
         }
 
     }
@@ -201,7 +200,7 @@ public class Game {
                 currentBlock = newBlock;
                 merges++;
             }
-            if (merges > 0) {
+            if (merges > 0 && client != null) {
                 client.send("move " + dir);
             }
 
@@ -238,7 +237,8 @@ public class Game {
         int row = g.getRow();
         int col = g.getCol();
         grid[row][col] = new Block(value, BColor.BLUE, new Coordinate());
-        client.send("addblock " + row + " " + col + " " + value);
+        if (client != null)
+            client.send("addblock " + row + " " + col + " " + value);
     }
 
     public Block[][] getGrid() {
