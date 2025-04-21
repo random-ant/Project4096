@@ -5,7 +5,14 @@ public class Block extends Actor {
 
     private int value;
     private BColor color;
+    private int velocY;
 
+      private
+    int accelY;
+    private int accelX;
+    
+
+    
     public Block(int value, BColor color) {
         this.value = value;
         this.color = color;
@@ -30,8 +37,8 @@ public class Block extends Actor {
     }
 
     public void act() {
-    }
-
+        
+    } 
     public int getValue() {
         return value;
     }
@@ -46,5 +53,9 @@ public class Block extends Actor {
 
     public void setColor(BColor color) {
         this.color = color;
+    }
+ p
+
+        
     }
 }

@@ -30,6 +30,7 @@ public class GameWorld extends World {
     private int RED_SCORE = 0;
     private int BLUE_SCORE = 0;
 
+    Block ex = new Block(2, BColor.RED);
     /**
      * Which players turn it is.
      * 
@@ -53,6 +54,10 @@ public class GameWorld extends World {
 
         spawnRandomBlocks(10);
         renderGrid();
+
+        
+        addObject(ex, 100, 200);
+        
     }
 
     /**
@@ -123,12 +128,14 @@ public class GameWorld extends World {
     public void act() {
         int BLOCKS_SPAWNED_PER_MOVE = 3;
 
+        
         // listen for key presses and act accordingly
         if (keyPresssed(Keyboard.KEY_UP)) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 ArrayList<Block> col = new ArrayList<Block>();
                 ArrayList<Block> result = new ArrayList<Block>();
 
+                
                 for (int i = 0; i <= GRID_HEIGHT; i++) {
                     // when there's a wall, merge what we already have
                     if (topWalls.contains(new Coordinate(i, j)) || i == GRID_HEIGHT) {
@@ -269,6 +276,11 @@ public class GameWorld extends World {
             if (currentBlock == null)
                 continue;
 
+            // for (int a = 5; a < 300; a++) {
+            //     currentBlock.setLocation(currentBlock.getX() + a, currentBlock.getY() + a);
+            //     renderGrid();
+            //     System.out.println("moving");
+            // }
             currentBlock.setColor(BColor.RED);
             while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
                 Block top = stack.pop();
