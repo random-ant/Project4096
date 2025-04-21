@@ -30,7 +30,6 @@ public class GameWorld extends World {
     private int RED_SCORE = 0;
     private int BLUE_SCORE = 0;
 
-    Block ex = new Block(2, BColor.RED);
     /**
      * Which players turn it is.
      * 
@@ -52,12 +51,14 @@ public class GameWorld extends World {
         turnGraph = new TurnGraphic(turn);
         addObject(turnGraph, 40, 55);
 
+        grid[1][0] = new Block(2, BColor.BLUE);
+        grid[2][0] = new Block(2, BColor.BLUE);
+        grid[3][0] = new Block(4, BColor.BLUE);
+        grid[4][0] = new Block(2, BColor.BLUE);
+        grid[5][0] = new Block(2, BColor.BLUE);
+
         spawnRandomBlocks(10);
         renderGrid();
-
-        
-        addObject(ex, 100, 200);
-        
     }
 
     /**
@@ -67,8 +68,8 @@ public class GameWorld extends World {
      * @return void
      */
     private void addWalls() {
-        topWalls.add(new Coordinate(4, 0));
-        leftWalls.add(new Coordinate(0, 3));
+        // topWalls.add(new Coordinate(4, 0));
+        // leftWalls.add(new Coordinate(0, 3));
     }
 
     /**
@@ -127,29 +128,41 @@ public class GameWorld extends World {
     @Override
     public void act() {
         int BLOCKS_SPAWNED_PER_MOVE = 3;
+        double ANIMATION_TIME = 150;
 
-        
         // listen for key presses and act accordingly
         if (keyPresssed(Keyboard.KEY_UP)) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 ArrayList<Block> col = new ArrayList<Block>();
                 ArrayList<Block> result = new ArrayList<Block>();
 
-                
                 for (int i = 0; i <= GRID_HEIGHT; i++) {
                     // when there's a wall, merge what we already have
                     if (topWalls.contains(new Coordinate(i, j)) || i == GRID_HEIGHT) {
-                        ArrayList<Block> toAdd = merge(col);
+                        ArrayList<Block> toAdd = merge(col, true, j);
                         result.addAll(toAdd);
 
                         // add empty blocks
                         result.addAll(Arrays.asList(new Block[i - result.size()]));
 
-                        col.clear();
+                        // update velocities of blocks
+                        for (Block b : col) {
+                            if (b == null)
+                                continue;
 
+                            double x0 = b.getY();
+                            double xf = b.getTargetDestination().getRow() * TILE_HEIGHT + OFFSET_Y
+                                    + (TILE_HEIGHT - BLOCK_HEIGHT) / 2;
+                            double acceleration = 2 * (xf - x0) / (ANIMATION_TIME * ANIMATION_TIME);
+
+                            b.setAy(acceleration);
+                        }
+
+                        // reset for the next batch
+                        col.clear();
                     }
 
-                    if (i < GRID_HEIGHT && grid[i][j] != null) {
+                    if (i < GRID_HEIGHT) {
                         col.add(grid[i][j]);
                     }
                 }
@@ -161,102 +174,99 @@ public class GameWorld extends World {
             }
 
             spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-            renderGrid();
-            swapActivePlayer();
-
-        } else if (keyPresssed(Keyboard.KEY_DOWN)) {
-            for (int j = 0; j < GRID_WIDTH; j++) {
-                ArrayList<Block> col = new ArrayList<Block>();
-                ArrayList<Block> result = new ArrayList<Block>();
-
-                for (int i = GRID_HEIGHT - 1; i >= 0; i--) {
-                    if (grid[i][j] != null) {
-                        col.add(grid[i][j]);
-                    }
-
-                    if (topWalls.contains(new Coordinate(i, j)) || i == 0) {
-                        ArrayList<Block> toAdd = merge(col);
-                        // add empty blocks
-                        result.addAll(toAdd);
-                        result.addAll(Arrays.asList(new Block[GRID_HEIGHT - i - result.size()]));
-
-                        col.clear();
-                    }
-                }
-
-                Collections.reverse(result);
-
-                // put in grid
-                for (int i = 0; i < GRID_HEIGHT; i++) {
-                    grid[i][j] = result.get(i);
-                }
-            }
-
-            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-            renderGrid();
-            swapActivePlayer();
-
-        } else if (keyPresssed(Keyboard.KEY_LEFT)) {
-            for (int i = 0; i < GRID_HEIGHT; i++) {
-                ArrayList<Block> row = new ArrayList<Block>();
-                ArrayList<Block> result = new ArrayList<Block>();
-
-                for (int j = 0; j <= GRID_WIDTH; j++) {
-                    if (leftWalls.contains(new Coordinate(i, j)) || j == GRID_WIDTH) {
-                        ArrayList<Block> toAdd = merge(row);
-                        result.addAll(toAdd);
-                        // add empty blocks
-                        result.addAll(Arrays.asList(new Block[j - result.size()]));
-                        row.clear();
-                    }
-
-                    if (j < GRID_WIDTH && grid[i][j] != null) {
-                        row.add(grid[i][j]);
-                    }
-                }
-
-                // put in grid
-                for (int j = 0; j < GRID_HEIGHT; j++) {
-                    grid[i][j] = result.get(j);
-                }
-            }
-
-            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-            renderGrid();
-            swapActivePlayer();
-
-        } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
-            for (int i = 0; i < GRID_HEIGHT; i++) {
-                ArrayList<Block> row = new ArrayList<Block>();
-                ArrayList<Block> result = new ArrayList<Block>();
-
-                for (int j = GRID_WIDTH - 1; j >= 0; j--) {
-                    if (grid[i][j] != null) {
-                        row.add(grid[i][j]);
-                    }
-
-                    if (leftWalls.contains(new Coordinate(i, j)) || j == 0) {
-                        ArrayList<Block> toAdd = merge(row);
-                        result.addAll(toAdd);
-                        // add empty blocks
-                        result.addAll(Arrays.asList(new Block[GRID_WIDTH - j - result.size()]));
-                        row.clear();
-                    }
-                }
-
-                Collections.reverse(result);
-
-                // put in grid
-                for (int j = 0; j < GRID_HEIGHT; j++) {
-                    grid[i][j] = result.get(j);
-                }
-            }
-
-            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-            renderGrid();
+            // renderGrid();
             swapActivePlayer();
 
         }
+        // else if (keyPresssed(Keyboard.KEY_DOWN)) {
+        // for (int j = 0; j < GRID_WIDTH; j++) {
+        // ArrayList<Block> col = new ArrayList<Block>();
+        // ArrayList<Block> result = new ArrayList<Block>();
+
+        // for (int i = GRID_HEIGHT - 1; i >= 0; i--) {
+        // col.add(grid[i][j]);
+
+        // if (topWalls.contains(new Coordinate(i, j)) || i == 0) {
+        // ArrayList<Block> toAdd = merge(col);
+        // // add empty blocks
+        // result.addAll(toAdd);
+        // result.addAll(Arrays.asList(new Block[GRID_HEIGHT - i - result.size()]));
+
+        // col.clear();
+        // }
+        // }
+
+        // Collections.reverse(result);
+
+        // // put in grid
+        // for (int i = 0; i < GRID_HEIGHT; i++) {
+        // grid[i][j] = result.get(i);
+        // }
+        // }
+
+        // spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
+        // renderGrid();
+        // swapActivePlayer();
+
+        // } else if (keyPresssed(Keyboard.KEY_LEFT)) {
+        // for (int i = 0; i < GRID_HEIGHT; i++) {
+        // ArrayList<Block> row = new ArrayList<Block>();
+        // ArrayList<Block> result = new ArrayList<Block>();
+
+        // for (int j = 0; j <= GRID_WIDTH; j++) {
+        // if (leftWalls.contains(new Coordinate(i, j)) || j == GRID_WIDTH) {
+        // ArrayList<Block> toAdd = merge(row);
+        // result.addAll(toAdd);
+        // // add empty blocks
+        // result.addAll(Arrays.asList(new Block[j - result.size()]));
+        // row.clear();
+        // }
+
+        // if (j < GRID_WIDTH) {
+        // row.add(grid[i][j]);
+        // }
+        // }
+
+        // // put in grid
+        // for (int j = 0; j < GRID_HEIGHT; j++) {
+        // grid[i][j] = result.get(j);
+        // }
+        // }
+
+        // spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
+        // renderGrid();
+        // swapActivePlayer();
+
+        // } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
+        // for (int i = 0; i < GRID_HEIGHT; i++) {
+        // ArrayList<Block> row = new ArrayList<Block>();
+        // ArrayList<Block> result = new ArrayList<Block>();
+
+        // for (int j = GRID_WIDTH - 1; j >= 0; j--) {
+        // row.add(grid[i][j]);
+
+        // if (leftWalls.contains(new Coordinate(i, j)) || j == 0) {
+        // ArrayList<Block> toAdd = merge(row);
+        // result.addAll(toAdd);
+        // // add empty blocks
+        // result.addAll(Arrays.asList(new Block[GRID_WIDTH - j - result.size()]));
+        // row.clear();
+        // }
+        // }
+
+        // Collections.reverse(result);
+
+        // // put in grid
+        // for (int j = 0; j < GRID_HEIGHT; j++) {
+        // grid[i][j] = result.get(j);
+        // }
+        // }
+
+        // spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
+        // renderGrid();
+        // swapActivePlayer();
+
+        // }
     }
 
     /**
@@ -268,20 +278,18 @@ public class GameWorld extends World {
      * @return An {@code ArrayList} of merged blocks. All empty blocks will have
      *         been removed.
      */
-    public ArrayList<Block> merge(ArrayList<Block> blocks) {
+    public ArrayList<Block> merge(ArrayList<Block> blocks, boolean isVertical, int index) {
         Stack<Block> stack = new Stack<Block>();
+        // index in row -> new index in row
+        Map<Integer, Integer> positionShifts = new HashMap<Integer, Integer>();
 
-        for (Block b : blocks) {
-            Block currentBlock = b;
+        for (int i = 0; i < blocks.size(); i++) {
+            Block currentBlock = blocks.get(i);
             if (currentBlock == null)
                 continue;
 
-            // for (int a = 5; a < 300; a++) {
-            //     currentBlock.setLocation(currentBlock.getX() + a, currentBlock.getY() + a);
-            //     renderGrid();
-            //     System.out.println("moving");
-            // }
             currentBlock.setColor(BColor.RED);
+
             while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
                 Block top = stack.pop();
                 int newValue = top.getValue() * 2;
@@ -300,6 +308,7 @@ public class GameWorld extends World {
             }
             stack.add(currentBlock);
 
+            positionShifts.put(i, stack.size() - 1);
         }
 
         ArrayList<Block> result = new ArrayList<Block>();
@@ -308,6 +317,21 @@ public class GameWorld extends World {
             result.add(stack.pop());
 
         Collections.reverse(result);
+
+        // update coordinates of blocks
+        for (int i = 0; i < blocks.size(); i++) {
+            if (blocks.get(i) == null)
+                continue;
+
+            Block b = blocks.get(i);
+            int target = positionShifts.get(i);
+            if (isVertical) {
+                b.setTargetDestination(new Coordinate(target, index));
+            } else {
+                b.setTargetDestination(new Coordinate(index, target));
+            }
+        }
+
         return result;
     }
 
@@ -344,7 +368,7 @@ public class GameWorld extends World {
         Collections.shuffle(empty);
         for (int i = 0; i < numBlocks && i < empty.size(); i++) {
             Coordinate g = empty.get(i);
-            grid[g.getRow()][g.getCol()] = new Block(value, BColor.NEUTRAL);
+            // grid[g.getRow()][g.getCol()] = new Block(value, BColor.NEUTRAL);
         }
     }
 

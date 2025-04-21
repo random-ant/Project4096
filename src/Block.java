@@ -5,17 +5,14 @@ public class Block extends Actor {
 
     private int value;
     private BColor color;
-    private int velocY;
+    private Coordinate targetDestination;
+    private double vx, vy;
+    private double ax, ay;
 
-      private
-    int accelY;
-    private int accelX;
-    
-
-    
     public Block(int value, BColor color) {
         this.value = value;
         this.color = color;
+        vx = vy = ax = ay = 0;
 
         if (color == BColor.NEUTRAL) {
             MayflowerImage img = new MayflowerImage("src/img/blocks/neutral/neutral-block" + value + ".png");
@@ -37,8 +34,20 @@ public class Block extends Actor {
     }
 
     public void act() {
-        
-    } 
+        // Update the block's position based on its velocity and acceleration
+        vx += ax;
+        vy += ay;
+        setLocation(getX() + vx, getY() + vy);
+    }
+
+    public Coordinate getTargetDestination() {
+        return targetDestination;
+    }
+
+    public void setTargetDestination(Coordinate targetDestination) {
+        this.targetDestination = targetDestination;
+    }
+
     public int getValue() {
         return value;
     }
@@ -54,8 +63,13 @@ public class Block extends Actor {
     public void setColor(BColor color) {
         this.color = color;
     }
- p
 
-        
+    public void setAx(double ax) {
+        this.ax = ax;
     }
+
+    public void setAy(double ay) {
+        this.ay = ay;
+    }
+
 }
