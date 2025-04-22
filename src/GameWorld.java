@@ -58,21 +58,7 @@ public class GameWorld extends World {
             }
         }
 
-        // spawn top walls
-        for (Coordinate c : topWalls) {
-            int x_coord = (c.getCol() * TILE_WIDTH) + OFFSET_X;
-            int y_coord = (c.getRow() * TILE_HEIGHT) + OFFSET_Y;
-            addObject(new HorizontalWall(), x_coord - (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord - (TILE_HEIGHT
-                    - BLOCK_HEIGHT) / 2);
-        }
-
-        // spawn left walls
-        for (Coordinate c : leftWalls) {
-            int x_coord = (c.getCol() * TILE_WIDTH) + OFFSET_X;
-            int y_coord = (c.getRow() * TILE_HEIGHT) + OFFSET_Y;
-            addObject(new VerticalWall(), x_coord - (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord - (TILE_HEIGHT
-                    - BLOCK_HEIGHT) / 2);
-        }
+        
 
         renderGrid();
     }
@@ -97,11 +83,30 @@ public class GameWorld extends World {
                 int y_coord = (i * TILE_WIDTH) + OFFSET_Y;
 
                 Block currBlock = game.getGrid()[i][j];
+                if (currBlock == null) {
+                    addObject(new Tile(), x_coord, y_coord);
+                } else {
                 // add blocks
                 addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord +
                         (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
-                // addObject(currBlock, 200, 200);
+                }
             }
+        }
+
+        // spawn top walls
+        for (Coordinate c : topWalls) {
+            int x_coord = (c.getCol() * TILE_WIDTH) + OFFSET_X;
+            int y_coord = (c.getRow() * TILE_HEIGHT) + OFFSET_Y;
+            addObject(new HorizontalWall(), x_coord - (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord - (TILE_HEIGHT
+                    - BLOCK_HEIGHT) / 2);
+        }
+
+        // spawn left walls
+        for (Coordinate c : leftWalls) {
+            int x_coord = (c.getCol() * TILE_WIDTH) + OFFSET_X;
+            int y_coord = (c.getRow() * TILE_HEIGHT) + OFFSET_Y;
+            addObject(new VerticalWall(), x_coord - (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord - (TILE_HEIGHT
+                    - BLOCK_HEIGHT) / 2);
         }
 
         // update score text
