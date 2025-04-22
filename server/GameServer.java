@@ -46,65 +46,63 @@ public class GameServer extends Server {
 			BColor player = blueClients.contains(id) ? BColor.BLUE : BColor.RED;
 			BColor curr = game.getCurrentPlayer();
 			// if (curr == player) {
-				// parse the row and col from the message
-				String[] parts = message.trim().split(" ");
-				if ("addblock".equals(parts[0]) || "move".equals(parts[0]) || "render".equals(parts[0])) {
-					try {
-						// Integer.parseInt() can throw an exception
-						if ("addblock".equals(parts[0])) {
-							int row = Integer.parseInt(parts[1]);
-							int col = Integer.parseInt(parts[2]);
-							int val = Integer.parseInt(parts[3]);
+			// parse the row and col from the message
+			String[] parts = message.trim().split(" ");
+			if ("addblock".equals(parts[0]) || "move".equals(parts[0]) || "render".equals(parts[0])) {
+				try {
+					// Integer.parseInt() can throw an exception
+					if ("addblock".equals(parts[0])) {
+						int row = Integer.parseInt(parts[1]);
+						int col = Integer.parseInt(parts[2]);
+						int val = Integer.parseInt(parts[3]);
 
-							// check if a piece can be placed at (row, col)
-							if (null == game.getBlock(row, col)) {
+						// check if a piece can be placed at (row, col)
+						if (null == game.getBlock(row, col)) {
 
-								// FIX FIX
-								
+							// FIX FIX
 
-								game.addBlock(row, col, val, BColor.BLUE);
+							game.addBlock(row, col, val, BColor.NEUTRAL);
 
-								// broadcast this move to both clients in this game
-								String response = "addblock " + row + " " + col + " " + val;
-								// send(id, response);
-								send(otherPlayer.get(id), response);
-
-							} else {
-								send(id, "error location is occupied: [" + message + "]");
-							}
-						}
-						if ("move".equals(parts[0])) {
-							String dir = parts[1];
-							if ("UP".equals(dir)) {
-								game.merge(Direction.UP);
-							} else if ("DOWN".equals(dir)) {
-								game.merge(Direction.DOWN);
-							} else if ("LEFT".equals(dir)) {
-								game.merge(Direction.LEFT);
-							} else if ("RIGHT".equals(dir)) {
-								game.merge(Direction.RIGHT);
-							}
-							game.nextPlayer();
-
-
-							// response
-							String response = "move " + dir;
+							// broadcast this move to both clients in this game
+							String response = "addblock " + row + " " + col + " " + val;
 							// send(id, response);
 							send(otherPlayer.get(id), response);
+
+						} else {
+							send(id, "error location is occupied: [" + message + "]");
 						}
-						if ("render".equals(parts[0])) {
-							send(otherPlayer.get(id), "render");
-						}
-					} catch (Exception e) {
-						send(id, "error invalid request: [" + message + "]");
-						e.printStackTrace();
 					}
-				} else {
+					if ("move".equals(parts[0])) {
+						String dir = parts[1];
+						if ("UP".equals(dir)) {
+							game.merge(Direction.UP);
+						} else if ("DOWN".equals(dir)) {
+							game.merge(Direction.DOWN);
+						} else if ("LEFT".equals(dir)) {
+							game.merge(Direction.LEFT);
+						} else if ("RIGHT".equals(dir)) {
+							game.merge(Direction.RIGHT);
+						}
+						game.nextPlayer();
+
+						// response
+						String response = "move " + dir;
+						// send(id, response);
+						send(otherPlayer.get(id), response);
+					}
+					if ("render".equals(parts[0])) {
+						send(otherPlayer.get(id), "render");
+					}
+				} catch (Exception e) {
 					send(id, "error invalid request: [" + message + "]");
-					System.out.println(parts);
+					e.printStackTrace();
 				}
+			} else {
+				send(id, "error invalid request: [" + message + "]");
+				System.out.println(parts);
+			}
 			// } else {
-			// 	send(id, "error not your turn");
+			// send(id, "error not your turn");
 			// }
 		} else {
 			send(id, "error game not found");
@@ -160,7 +158,7 @@ public class GameServer extends Server {
 				send(clientA, "youare RED");
 			}
 
-			game.addBlock(1, 1, 2, BColor.BLUE);
+			game.addBlock(1, 1, 2, BColor.NEUTRAL);
 			send(clientA, "addblock 1 1 2");
 			send(clientB, "addblock 1 1 2");
 			send(clientA, "render");

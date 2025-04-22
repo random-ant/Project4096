@@ -6,10 +6,6 @@ public class GameWorld extends World {
     private Block[][] grid;
     private GameClient client;
 
-    /**
-     * The walls of the grid. The location of the walls is stored as a coordinate of
-     * the block it is relative to.
-     */
     private Set<Coordinate> topWalls, leftWalls;
 
     /**
@@ -36,10 +32,9 @@ public class GameWorld extends World {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
         this.client = client;
         this.game = game;
-        topWalls = new HashSet<Coordinate>();
-        leftWalls = new HashSet<Coordinate>();
+        topWalls = game.getTopWalls();
+        leftWalls = game.getLeftWalls();
 
-        addWalls();
         // addObject(new Title(), 20, 20);
         addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
@@ -50,11 +45,10 @@ public class GameWorld extends World {
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 int x_coord = (j * TILE_WIDTH) + OFFSET_X;
-                int y_coord = (i * TILE_WIDTH) + OFFSET_Y;
+                int y_coord = (i * TILE_HEIGHT) + OFFSET_Y;
 
                 // add blocks
-                addObject(new Tile(), x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord +
-                        (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
+                addObject(new Tile(), x_coord, y_coord);
                 // addObject(currBlock, 200, 200);
             }
         }
@@ -84,17 +78,6 @@ public class GameWorld extends World {
 
     public void setTurnGraph(TurnGraphic turnGraph) {
         this.turnGraph = turnGraph;
-    }
-
-    /**
-     * Adds walls to the grid. This method should be called when the game world is
-     * first created.
-     * 
-     * @return void
-     */
-    private void addWalls() {
-        topWalls.add(new Coordinate(4, 0));
-        leftWalls.add(new Coordinate(0, 3));
     }
 
     /**
@@ -206,9 +189,8 @@ public class GameWorld extends World {
 }
 
 // listen for key presses and act accordingly
-// if(keyPresssed(Keyboard.KEY_UP)){for(
-
-// int j = 0;j<GRID_WIDTH;j++)
+// if(keyPresssed(Keyboard.KEY_UP)){
+// for(int j = 0;j<GRID_WIDTH;j++)
 // {
 // ArrayList<Block> col = new ArrayList<Block>();
 // ArrayList<Block> result = new ArrayList<Block>();

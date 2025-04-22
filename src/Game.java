@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Arrays;
 import java.util.Stack;
-
-
 
 public class Game {
     int GRID_WIDTH = 10;
@@ -13,9 +13,37 @@ public class Game {
     BColor myColor;
     GameClient client;
 
+    /**
+     * The walls of the grid. The location of the walls is stored as a coordinate of
+     * the block it is relative to.
+     */
+    private Set<Coordinate> topWalls, leftWalls;
+
+    public Set<Coordinate> getTopWalls() {
+        return topWalls;
+    }
+
+    public Set<Coordinate> getLeftWalls() {
+        return leftWalls;
+    }
+
     public Game() {
         this.grid = new Block[GRID_HEIGHT][GRID_WIDTH];
         this.currentPlayer = BColor.BLUE;
+        topWalls = new HashSet<Coordinate>();
+        leftWalls = new HashSet<Coordinate>();
+        addWalls();
+    }
+
+    /**
+     * Adds walls to the grid. This method should be called when the game world is
+     * first created.
+     * 
+     * @return void
+     */
+    private void addWalls() {
+        topWalls.add(new Coordinate(4, 0));
+        leftWalls.add(new Coordinate(0, 3));
     }
 
     public Game copy() {
@@ -115,35 +143,56 @@ public class Game {
         if (dir == Direction.UP) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 ArrayList<Block> col = new ArrayList<Block>();
-                for (int i = 0; i < GRID_HEIGHT; i++) {
-                    col.add(grid[i][j]);
-                }
+                ArrayList<Block> result = new ArrayList<Block>();
 
-                ArrayList<Block> result = check(col, dir);
-                Collections.reverse(result);
-                // add empty blocks
-                result.addAll(result.size(), Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
+                for (int i = 0; i <= GRID_HEIGHT; i++) {
+                    // when there's a wall, merge what we already have
+                    if (topWalls.contains(new Coordinate(i, j)) || i == GRID_HEIGHT) {
+                        ArrayList<Block> toAdd = check(col, dir);
+                        result.addAll(toAdd);
+
+                        // add empty blocks
+                        result.addAll(Arrays.asList(new Block[i - result.size()]));
+
+                        col.clear();
+
+                    }
+
+                    if (i < GRID_HEIGHT && grid[i][j] != null) {
+                        col.add(grid[i][j]);
+                    }
+                }
 
                 // put in grid
                 for (int i = 0; i < GRID_HEIGHT; i++) {
                     grid[i][j] = result.get(i);
                 }
 
+                // for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
+                // spawnRandomBlock();
             }
-
-            // for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-            // spawnRandomBlock();
 
         } else if (dir == Direction.DOWN) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 ArrayList<Block> col = new ArrayList<Block>();
+                ArrayList<Block> result = new ArrayList<Block>();
+
                 for (int i = GRID_HEIGHT - 1; i >= 0; i--) {
-                    col.add(grid[i][j]);
+                    if (grid[i][j] != null) {
+                        col.add(grid[i][j]);
+                    }
+
+                    if (topWalls.contains(new Coordinate(i, j)) || i == 0) {
+                        ArrayList<Block> toAdd = check(col, dir);
+                        // add empty blocks
+                        result.addAll(toAdd);
+                        result.addAll(Arrays.asList(new Block[GRID_HEIGHT - i - result.size()]));
+
+                        col.clear();
+                    }
                 }
 
-                ArrayList<Block> result = check(col, dir);
-                // add empty blocks
-                result.addAll(0, Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
+                Collections.reverse(result);
 
                 // put in grid
                 for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -156,14 +205,21 @@ public class Game {
         } else if (dir == Direction.LEFT) {
             for (int i = 0; i < GRID_HEIGHT; i++) {
                 ArrayList<Block> row = new ArrayList<Block>();
-                for (int j = 0; j < GRID_WIDTH; j++) {
-                    row.add(grid[i][j]);
-                }
+                ArrayList<Block> result = new ArrayList<Block>();
 
-                ArrayList<Block> result = check(row, dir);
-                Collections.reverse(result);
-                // add empty blocks
-                result.addAll(result.size(), Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
+                for (int j = 0; j <= GRID_WIDTH; j++) {
+                    if (leftWalls.contains(new Coordinate(i, j)) || j == GRID_WIDTH) {
+                        ArrayList<Block> toAdd = check(row, dir);
+                        result.addAll(toAdd);
+                        // add empty blocks
+                        result.addAll(Arrays.asList(new Block[j - result.size()]));
+                        row.clear();
+                    }
+
+                    if (j < GRID_WIDTH && grid[i][j] != null) {
+                        row.add(grid[i][j]);
+                    }
+                }
 
                 // put in grid
                 for (int j = 0; j < GRID_HEIGHT; j++) {
@@ -176,13 +232,23 @@ public class Game {
         } else if (dir == Direction.RIGHT) {
             for (int i = 0; i < GRID_HEIGHT; i++) {
                 ArrayList<Block> row = new ArrayList<Block>();
+                ArrayList<Block> result = new ArrayList<Block>();
+
                 for (int j = GRID_WIDTH - 1; j >= 0; j--) {
-                    row.add(grid[i][j]);
+                    if (grid[i][j] != null) {
+                        row.add(grid[i][j]);
+                    }
+
+                    if (leftWalls.contains(new Coordinate(i, j)) || j == 0) {
+                        ArrayList<Block> toAdd = check(row, dir);
+                        result.addAll(toAdd);
+                        // add empty blocks
+                        result.addAll(Arrays.asList(new Block[GRID_WIDTH - j - result.size()]));
+                        row.clear();
+                    }
                 }
 
-                ArrayList<Block> result = check(row, dir);
-                // add empty blocks
-                result.addAll(0, Arrays.asList(new Block[GRID_HEIGHT - result.size()]));
+                Collections.reverse(result);
 
                 // put in grid
                 for (int j = 0; j < GRID_HEIGHT; j++) {
