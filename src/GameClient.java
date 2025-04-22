@@ -41,7 +41,12 @@ public class GameClient extends Client {
             game.setMyColor(player);
 
             world = new GameWorld(this, game);
-            world.getTurnGraph().setTurn(player == BColor.BLUE);
+            
+            if (player == BColor.BLUE)
+                world.getTurnGraph().setTurn(BColor.BLUE);
+            else
+                world.getTurnGraph().setTurn(BColor.NEUTRAL);
+
 
             new MyMayflower("game", 800, 1000, world);
 
@@ -59,6 +64,7 @@ public class GameClient extends Client {
                 game.merge(Direction.RIGHT);
             }
             game.nextPlayer();
+            world.getTurnGraph().setTurn(game.getMyColor());
             world.renderGrid();
         } else if ("addblock".equals(parts[0])) {
             int row = Integer.parseInt(parts[1]);
