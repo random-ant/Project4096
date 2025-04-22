@@ -2,7 +2,9 @@ import mayflower.*;
 import java.util.*;
 
 public class GameWorld extends World {
-    private Block[][] grid;
+    private Game game;
+    private Block[][] blocks;
+    private GameClient client;
 
     /**
      * The walls of the grid. The location of the walls is stored as a coordinate of
@@ -30,24 +32,21 @@ public class GameWorld extends World {
     private int RED_SCORE = 0;
     private int BLUE_SCORE = 0;
 
-    /**
-     * Which players turn it is.
-     * 
-     * If FALSE, then it is BLUE's turn. If TRUE, then it
-     * is RED's turn.
-     */
-    public static boolean turn;
 
     public GameWorld() {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
         topWalls = new HashSet<Coordinate>();
         leftWalls = new HashSet<Coordinate>();
         turn = true; // blue goes first
+>>>>>>> origin/main
 
         addWalls();
         // addObject(new Title(), 20, 20);
         addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
+<<<<<<< HEAD
+
+=======
         turnGraph = new TurnGraphic(turn);
         addObject(turnGraph, 40, 55);
 
@@ -71,6 +70,7 @@ public class GameWorld extends World {
      * score text. Should be called whenever game state is changed.
      */
     private void renderGrid() {
+>>>>>>> origin/main
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 int x_coord = (j * TILE_WIDTH) + OFFSET_X;
@@ -78,12 +78,30 @@ public class GameWorld extends World {
 
                 // add base tiles
                 addObject(new Tile(), x_coord, y_coord);
+            }
+        }
 
+<<<<<<< HEAD
+        renderGrid();
+
+    }
+
+    public void renderGrid() {
+
+        for (int i = 0; i < GRID_HEIGHT; i++) {
+            for (int j = 0; j < GRID_WIDTH; j++) {
+                int x_coord = (j * TILE_WIDTH) + OFFSET_X;
+                int y_coord = (i * TILE_WIDTH) + OFFSET_Y;
+
+                Block currBlock = game.getGrid()[i][j];
+=======
                 // add blocks
                 Block currBlock = grid[i][j];
+>>>>>>> origin/main
                 if (currBlock != null) {
-                    addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2,
-                            y_coord + (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
+                    addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord +
+                            (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
+                    // addObject(currBlock, 200, 200);
                 }
             }
         }
@@ -121,6 +139,25 @@ public class GameWorld extends World {
 
     @Override
     public void act() {
+<<<<<<< HEAD
+        showText(game.getMyColor().toString(), 100, 100);
+
+        showText(game.getCurrentPlayer().toString(), 200, 200);
+        if (game.isTurn()) {
+            if (keyPressed(Keyboard.KEY_UP) || keyPressed(Keyboard.KEY_DOWN) || keyPressed(Keyboard.KEY_LEFT) || keyPressed(Keyboard.KEY_RIGHT)) {
+                if (keyPressed(Keyboard.KEY_UP)) {
+                    game.merge(Direction.UP);
+                    client.send("move " + Direction.UP);
+                } else if (keyPressed(Keyboard.KEY_DOWN)) {
+                    game.merge(Direction.DOWN);
+                    client.send("move " + Direction.DOWN);
+                } else if (keyPressed(Keyboard.KEY_LEFT)) {
+                    game.merge(Direction.LEFT);
+                    client.send("move " + Direction.LEFT);
+                } else if (keyPressed(Keyboard.KEY_RIGHT)) {
+                    game.merge(Direction.RIGHT);
+                    client.send("move " + Direction.RIGHT);
+=======
         int BLOCKS_SPAWNED_PER_MOVE = 3;
 
         // listen for key presses and act accordingly
@@ -150,8 +187,22 @@ public class GameWorld extends World {
                 // put in grid
                 for (int i = 0; i < GRID_HEIGHT; i++) {
                     grid[i][j] = result.get(i);
+>>>>>>> origin/main
                 }
+                Block add = game.spawnRandomBlock();
+                renderGrid();
+                String message = "addblock " + add.getCoord().getRow() + " " + add.getCoord().getCol() + " " + add.getValue();
+                client.send(message);
+                client.send("render");
+                game.nextPlayer();
             }
+<<<<<<< HEAD
+        }
+
+    }
+
+    private boolean keyPressed(int key) {
+=======
 
             spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
             renderGrid();
@@ -345,7 +396,13 @@ public class GameWorld extends World {
      *         {@code false} otherwise
      */
     private boolean keyPresssed(int key) {
+>>>>>>> origin/main
         return Mayflower.isKeyDown(key) && !Mayflower.wasKeyDown(key);
+    }
+
+    public void updateBlock(BColor color, int row, int col, int value) {
+        blocks[row][col].setColor(color);
+        blocks[row][col].setValue(value);
     }
 
 }

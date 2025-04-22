@@ -1,5 +1,9 @@
 {
-  "java.project.sourcePaths": ["src"],
+  "java.project.sourcePaths": [
+        "src",
+        "server",
+        "mayflower3.3.7.jar_Decompiler.com"
+    ],
   "java.project.outputPath": "bin",
   "java.project.referencedLibraries": ["lib/**/*.jar", "mayflower3.3.7.jar"],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
