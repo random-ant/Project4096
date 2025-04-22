@@ -1,8 +1,8 @@
 import mayflower.*;
 
-public class Border extends Actor {
+public class GridBorder extends Actor {
 
-    public Border() {
+    public GridBorder() {
         MayflowerImage border = new MayflowerImage("src/img/tile.png");
         border.scale(710, 710);
         setImage(border);
