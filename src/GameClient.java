@@ -41,6 +41,7 @@ public class GameClient extends Client {
             game.setMyColor(player);
 
             world = new GameWorld(this, game);
+            world.getTurnGraph().setTurn(player == BColor.BLUE);
 
             new MyMayflower("game", 800, 1000, world);
 

@@ -3,7 +3,7 @@ import java.util.*;
 
 public class GameWorld extends World {
     private Game game;
-    private Block[][] blocks;
+    private Block[][] grid;
     private GameClient client;
 
     /**
@@ -32,77 +32,30 @@ public class GameWorld extends World {
     private int RED_SCORE = 0;
     private int BLUE_SCORE = 0;
 
-
-    public GameWorld() {
+    public GameWorld(GameClient client, Game game) {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
+        this.client = client;
+        this.game = game;
         topWalls = new HashSet<Coordinate>();
         leftWalls = new HashSet<Coordinate>();
-        turn = true; // blue goes first
->>>>>>> origin/main
 
         addWalls();
         // addObject(new Title(), 20, 20);
         addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
-<<<<<<< HEAD
 
-=======
-        turnGraph = new TurnGraphic(turn);
+        turnGraph = new TurnGraphic(game.getCurrentPlayer() == BColor.BLUE);
         addObject(turnGraph, 40, 55);
-
-        spawnRandomBlocks(10);
-        renderGrid();
-    }
-
-    /**
-     * Adds walls to the grid. This method should be called when the game world is
-     * first created.
-     * 
-     * @return void
-     */
-    private void addWalls() {
-        topWalls.add(new Coordinate(4, 0));
-        leftWalls.add(new Coordinate(0, 3));
-    }
-
-    /**
-     * Renders the grid. Inclues all tiles, blocks, walls in the grid, plus the
-     * score text. Should be called whenever game state is changed.
-     */
-    private void renderGrid() {
->>>>>>> origin/main
-        for (int i = 0; i < GRID_HEIGHT; i++) {
-            for (int j = 0; j < GRID_WIDTH; j++) {
-                int x_coord = (j * TILE_WIDTH) + OFFSET_X;
-                int y_coord = (i * TILE_HEIGHT) + OFFSET_Y;
-
-                // add base tiles
-                addObject(new Tile(), x_coord, y_coord);
-            }
-        }
-
-<<<<<<< HEAD
-        renderGrid();
-
-    }
-
-    public void renderGrid() {
 
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 int x_coord = (j * TILE_WIDTH) + OFFSET_X;
                 int y_coord = (i * TILE_WIDTH) + OFFSET_Y;
 
-                Block currBlock = game.getGrid()[i][j];
-=======
                 // add blocks
-                Block currBlock = grid[i][j];
->>>>>>> origin/main
-                if (currBlock != null) {
-                    addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord +
-                            (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
-                    // addObject(currBlock, 200, 200);
-                }
+                addObject(new Tile(), x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord +
+                        (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
+                // addObject(currBlock, 200, 200);
             }
         }
 
@@ -122,29 +75,57 @@ public class GameWorld extends World {
                     - BLOCK_HEIGHT) / 2);
         }
 
+        renderGrid();
+    }
+
+    public TurnGraphic getTurnGraph() {
+        return turnGraph;
+    }
+
+    public void setTurnGraph(TurnGraphic turnGraph) {
+        this.turnGraph = turnGraph;
+    }
+
+    /**
+     * Adds walls to the grid. This method should be called when the game world is
+     * first created.
+     * 
+     * @return void
+     */
+    private void addWalls() {
+        topWalls.add(new Coordinate(4, 0));
+        leftWalls.add(new Coordinate(0, 3));
+    }
+
+    /**
+     * Renders the grid. Inclues all tiles, blocks, walls in the grid, plus the
+     * score text. Should be called whenever game state is changed.
+     */
+    public void renderGrid() {
+
+        for (int i = 0; i < GRID_HEIGHT; i++) {
+            for (int j = 0; j < GRID_WIDTH; j++) {
+                int x_coord = (j * TILE_WIDTH) + OFFSET_X;
+                int y_coord = (i * TILE_WIDTH) + OFFSET_Y;
+
+                Block currBlock = game.getGrid()[i][j];
+                // add blocks
+                addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord +
+                        (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
+                // addObject(currBlock, 200, 200);
+            }
+        }
+
         // update score text
         showText("score blue: " + BLUE_SCORE, 550, 55, Color.BLACK);
         showText("score red: " + RED_SCORE, 550, 110, Color.BLACK);
     }
 
-    /**
-     * Swaps who can make a move. Updates turn graphic accordingly.
-     * 
-     * @return void
-     */
-    private void swapActivePlayer() {
-        turn = !turn;
-        turnGraph.setTurn(turn);
-    }
-
     @Override
     public void act() {
-<<<<<<< HEAD
-        showText(game.getMyColor().toString(), 100, 100);
-
-        showText(game.getCurrentPlayer().toString(), 200, 200);
         if (game.isTurn()) {
-            if (keyPressed(Keyboard.KEY_UP) || keyPressed(Keyboard.KEY_DOWN) || keyPressed(Keyboard.KEY_LEFT) || keyPressed(Keyboard.KEY_RIGHT)) {
+            if (keyPressed(Keyboard.KEY_UP) || keyPressed(Keyboard.KEY_DOWN) || keyPressed(Keyboard.KEY_LEFT)
+                    || keyPressed(Keyboard.KEY_RIGHT)) {
                 if (keyPressed(Keyboard.KEY_UP)) {
                     game.merge(Direction.UP);
                     client.send("move " + Direction.UP);
@@ -157,197 +138,15 @@ public class GameWorld extends World {
                 } else if (keyPressed(Keyboard.KEY_RIGHT)) {
                     game.merge(Direction.RIGHT);
                     client.send("move " + Direction.RIGHT);
-=======
-        int BLOCKS_SPAWNED_PER_MOVE = 3;
-
-        // listen for key presses and act accordingly
-        if (keyPresssed(Keyboard.KEY_UP)) {
-            for (int j = 0; j < GRID_WIDTH; j++) {
-                ArrayList<Block> col = new ArrayList<Block>();
-                ArrayList<Block> result = new ArrayList<Block>();
-
-                for (int i = 0; i <= GRID_HEIGHT; i++) {
-                    // when there's a wall, merge what we already have
-                    if (topWalls.contains(new Coordinate(i, j)) || i == GRID_HEIGHT) {
-                        ArrayList<Block> toAdd = merge(col);
-                        result.addAll(toAdd);
-
-                        // add empty blocks
-                        result.addAll(Arrays.asList(new Block[i - result.size()]));
-
-                        col.clear();
-
-                    }
-
-                    if (i < GRID_HEIGHT && grid[i][j] != null) {
-                        col.add(grid[i][j]);
-                    }
                 }
-
-                // put in grid
-                for (int i = 0; i < GRID_HEIGHT; i++) {
-                    grid[i][j] = result.get(i);
->>>>>>> origin/main
-                }
-                Block add = game.spawnRandomBlock();
+                game.nextPlayer();
+                int[] add = game.spawnRandomBlock();
                 renderGrid();
-                String message = "addblock " + add.getCoord().getRow() + " " + add.getCoord().getCol() + " " + add.getValue();
+                String message = "addblock " + add[0] + " " + add[1] + " " + add[2];
                 client.send(message);
                 client.send("render");
-                game.nextPlayer();
             }
-<<<<<<< HEAD
         }
-
-    }
-
-    private boolean keyPressed(int key) {
-=======
-
-            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-            renderGrid();
-            swapActivePlayer();
-
-        } else if (keyPresssed(Keyboard.KEY_DOWN)) {
-            for (int j = 0; j < GRID_WIDTH; j++) {
-                ArrayList<Block> col = new ArrayList<Block>();
-                ArrayList<Block> result = new ArrayList<Block>();
-
-                for (int i = GRID_HEIGHT - 1; i >= 0; i--) {
-                    if (grid[i][j] != null) {
-                        col.add(grid[i][j]);
-                    }
-
-                    if (topWalls.contains(new Coordinate(i, j)) || i == 0) {
-                        ArrayList<Block> toAdd = merge(col);
-                        // add empty blocks
-                        result.addAll(toAdd);
-                        result.addAll(Arrays.asList(new Block[GRID_HEIGHT - i - result.size()]));
-
-                        col.clear();
-                    }
-                }
-
-                Collections.reverse(result);
-
-                // put in grid
-                for (int i = 0; i < GRID_HEIGHT; i++) {
-                    grid[i][j] = result.get(i);
-                }
-            }
-
-            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-            renderGrid();
-            swapActivePlayer();
-
-        } else if (keyPresssed(Keyboard.KEY_LEFT)) {
-            for (int i = 0; i < GRID_HEIGHT; i++) {
-                ArrayList<Block> row = new ArrayList<Block>();
-                ArrayList<Block> result = new ArrayList<Block>();
-
-                for (int j = 0; j <= GRID_WIDTH; j++) {
-                    if (leftWalls.contains(new Coordinate(i, j)) || j == GRID_WIDTH) {
-                        ArrayList<Block> toAdd = merge(row);
-                        result.addAll(toAdd);
-                        // add empty blocks
-                        result.addAll(Arrays.asList(new Block[j - result.size()]));
-                        row.clear();
-                    }
-
-                    if (j < GRID_WIDTH && grid[i][j] != null) {
-                        row.add(grid[i][j]);
-                    }
-                }
-
-                // put in grid
-                for (int j = 0; j < GRID_HEIGHT; j++) {
-                    grid[i][j] = result.get(j);
-                }
-            }
-
-            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-            renderGrid();
-            swapActivePlayer();
-
-        } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
-            for (int i = 0; i < GRID_HEIGHT; i++) {
-                ArrayList<Block> row = new ArrayList<Block>();
-                ArrayList<Block> result = new ArrayList<Block>();
-
-                for (int j = GRID_WIDTH - 1; j >= 0; j--) {
-                    if (grid[i][j] != null) {
-                        row.add(grid[i][j]);
-                    }
-
-                    if (leftWalls.contains(new Coordinate(i, j)) || j == 0) {
-                        ArrayList<Block> toAdd = merge(row);
-                        result.addAll(toAdd);
-                        // add empty blocks
-                        result.addAll(Arrays.asList(new Block[GRID_WIDTH - j - result.size()]));
-                        row.clear();
-                    }
-                }
-
-                Collections.reverse(result);
-
-                // put in grid
-                for (int j = 0; j < GRID_HEIGHT; j++) {
-                    grid[i][j] = result.get(j);
-                }
-            }
-
-            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-            renderGrid();
-            swapActivePlayer();
-
-        }
-    }
-
-    /**
-     * Merges blocks in the given array. The blocks are merged from left to right.
-     * Elements will always be merged to the largest possible element.
-     * 
-     * @param blocks The line of blocks to merge. Any {@code null} values are
-     *               considered empty tiles.
-     * @return An {@code ArrayList} of merged blocks. All empty blocks will have
-     *         been removed.
-     */
-    public ArrayList<Block> merge(ArrayList<Block> blocks) {
-        Stack<Block> stack = new Stack<Block>();
-
-        for (Block b : blocks) {
-            Block currentBlock = b;
-            if (currentBlock == null)
-                continue;
-
-            currentBlock.setColor(BColor.RED);
-            while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
-                Block top = stack.pop();
-                int newValue = top.getValue() * 2;
-                BColor newColor;
-
-                if (turn) { // if BLUE's turn
-                    newColor = BColor.BLUE;
-                    BLUE_SCORE += newValue;
-                } else {
-                    newColor = BColor.RED;
-                    RED_SCORE += newValue;
-                }
-
-                Block newBlock = new Block(newValue, newColor);
-                currentBlock = newBlock;
-            }
-            stack.add(currentBlock);
-
-        }
-
-        ArrayList<Block> result = new ArrayList<Block>();
-        // add stack elements to result array
-        while (!stack.empty())
-            result.add(stack.pop());
-
-        Collections.reverse(result);
-        return result;
     }
 
     private ArrayList<Coordinate> getEmptyTiles() {
@@ -395,14 +194,149 @@ public class GameWorld extends World {
      * @return {@code true} if the key was newly pressed down on the frame,
      *         {@code false} otherwise
      */
-    private boolean keyPresssed(int key) {
->>>>>>> origin/main
+    private boolean keyPressed(int key) {
         return Mayflower.isKeyDown(key) && !Mayflower.wasKeyDown(key);
     }
 
     public void updateBlock(BColor color, int row, int col, int value) {
-        blocks[row][col].setColor(color);
-        blocks[row][col].setValue(value);
+        grid[row][col].setColor(color);
+        grid[row][col].setValue(value);
     }
 
 }
+
+// listen for key presses and act accordingly
+// if(keyPresssed(Keyboard.KEY_UP)){for(
+
+// int j = 0;j<GRID_WIDTH;j++)
+// {
+// ArrayList<Block> col = new ArrayList<Block>();
+// ArrayList<Block> result = new ArrayList<Block>();
+
+// for (int i = 0; i <= GRID_HEIGHT; i++) {
+// // when there's a wall, merge what we already have
+// if (topWalls.contains(new Coordinate(i, j)) || i == GRID_HEIGHT) {
+// ArrayList<Block> toAdd = merge(col);
+// result.addAll(toAdd);
+
+// // add empty blocks
+// result.addAll(Arrays.asList(new Block[i - result.size()]));
+
+// col.clear();
+
+// }
+
+// if (i < GRID_HEIGHT && grid[i][j] != null) {
+// col.add(grid[i][j]);
+// }
+// }
+
+// // put in grid
+// for (int i = 0; i < GRID_HEIGHT; i++) {
+// grid[i][j] = result.get(i);
+// }
+// Block add = game.spawnRandomBlock();
+// renderGrid();
+// String message = "addblock " + add.getCoord().getRow() + " " +
+// add.getCoord().getCol() + " " + add.getValue();
+// client.send(message);
+// client.send("render");
+// game.nextPlayer();
+// }
+// }
+
+// }else if(keyPresssed(Keyboard.KEY_DOWN)){for(
+
+// int j = 0;j<GRID_WIDTH;j++)
+// {
+// ArrayList<Block> col = new ArrayList<Block>();
+// ArrayList<Block> result = new ArrayList<Block>();
+
+// for (int i = GRID_HEIGHT - 1; i >= 0; i--) {
+// if (grid[i][j] != null) {
+// col.add(grid[i][j]);
+// }
+
+// if (topWalls.contains(new Coordinate(i, j)) || i == 0) {
+// ArrayList<Block> toAdd = merge(col);
+// // add empty blocks
+// result.addAll(toAdd);
+// result.addAll(Arrays.asList(new Block[GRID_HEIGHT - i - result.size()]));
+
+// col.clear();
+// }
+// }
+
+// Collections.reverse(result);
+
+// // put in grid
+// for (int i = 0; i < GRID_HEIGHT; i++) {
+// grid[i][j] = result.get(i);
+// }
+// }
+
+// spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
+// renderGrid();
+// swapActivePlayer();
+
+// }else if(keyPresssed(Keyboard.KEY_LEFT)) {
+// for (int i = 0; i < GRID_HEIGHT; i++) {
+// ArrayList<Block> row = new ArrayList<Block>();
+// ArrayList<Block> result = new ArrayList<Block>();
+
+// for (int j = 0; j <= GRID_WIDTH; j++) {
+// if (leftWalls.contains(new Coordinate(i, j)) || j == GRID_WIDTH) {
+// ArrayList<Block> toAdd = merge(row);
+// result.addAll(toAdd);
+// // add empty blocks
+// result.addAll(Arrays.asList(new Block[j - result.size()]));
+// row.clear();
+// }
+
+// if (j < GRID_WIDTH && grid[i][j] != null) {
+// row.add(grid[i][j]);
+// }
+// }
+
+// // put in grid
+// for (int j = 0; j < GRID_HEIGHT; j++) {
+// grid[i][j] = result.get(j);
+// }
+// }
+
+// spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
+// renderGrid();
+// swapActivePlayer();
+
+// } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
+// for (int i = 0; i < GRID_HEIGHT; i++) {
+// ArrayList<Block> row = new ArrayList<Block>();
+// ArrayList<Block> result = new ArrayList<Block>();
+
+// for (int j = GRID_WIDTH - 1; j >= 0; j--) {
+// if (grid[i][j] != null) {
+// row.add(grid[i][j]);
+// }
+
+// if (leftWalls.contains(new Coordinate(i, j)) || j == 0) {
+// ArrayList<Block> toAdd = merge(row);
+// result.addAll(toAdd);
+// // add empty blocks
+// result.addAll(Arrays.asList(new Block[GRID_WIDTH - j - result.size()]));
+// row.clear();
+// }
+// }
+
+// Collections.reverse(result);
+
+// // put in grid
+// for (int j = 0; j < GRID_HEIGHT; j++) {
+// grid[i][j] = result.get(j);
+// }
+// }
+
+// spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
+// renderGrid();
+// swapActivePlayer();
+
+// }

@@ -1,5 +1,9 @@
 import java.util.ArrayList;
-import java.util.*;
+import java.util.Collections;
+import java.util.Arrays;
+import java.util.Stack;
+
+
 
 public class Game {
     int GRID_WIDTH = 10;
@@ -60,7 +64,7 @@ public class Game {
         if ((row < 0) || (col < 0) || (row >= GRID_HEIGHT) || (col >= GRID_WIDTH)) {
             return false;
         }
-        this.grid[row][col] = new Block(value, color, new Coordinate(row, col));
+        this.grid[row][col] = new Block(value, color);
         return true;
     }
 
@@ -98,6 +102,13 @@ public class Game {
         return out;
     }
 
+    /**
+     * Merges blocks in the given array. The blocks are merged from left to right.
+     * Elements will always be merged to the largest possible element.
+     * 
+     * @param dir The direction in which to merge.
+     * @return void
+     */
     public void merge(Direction dir) {
         int BLOCKS_SPAWNED_PER_MOVE = 10;
         // listen for key presses and act accordingly
@@ -197,9 +208,19 @@ public class Game {
             int merges = 0;
             while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
                 Block top = stack.pop();
-                Block newBlock = new Block(top.getValue() * 2, BColor.RED, new Coordinate());
+                Block newBlock = new Block(top.getValue() * 2, BColor.RED);
                 currentBlock = newBlock;
                 merges++;
+
+                // FIX SCORE
+
+                // if (game.isTurn()) { // if BLUE's turn
+                // newColor = BColor.BLUE;
+                // BLUE_SCORE += newValue;
+                // } else {
+                // newColor = BColor.RED;
+                // RED_SCORE += newValue;
+                // }
             }
             if (merges > 0 && client != null) {
                 // client.send("move " + dir);
@@ -223,7 +244,7 @@ public class Game {
         return empty.get(randomIndex);
     }
 
-    public Block spawnRandomBlock() {
+    public int[] spawnRandomBlock() {
         double spawnValue = Math.random();
         int value;
         if (spawnValue <= 0.7) {
@@ -237,9 +258,10 @@ public class Game {
         Coordinate g = getRandomEmptyTile();
         int row = g.getRow();
         int col = g.getCol();
-        grid[row][col] = new Block(value, BColor.BLUE, new Coordinate(row, col));
+        grid[row][col] = new Block(value, BColor.BLUE);
 
-        return grid[row][col];
+        int[] ret = { row, col, value };
+        return ret;
     }
 
     public Block[][] getGrid() {
