@@ -45,10 +45,10 @@ public class GameServer extends Server {
 			// check if it is this players turn
 			BColor player = blueClients.contains(id) ? BColor.BLUE : BColor.RED;
 			BColor curr = game.getCurrentPlayer();
-			if (curr == player) {
+			// if (curr == player) {
 				// parse the row and col from the message
 				String[] parts = message.trim().split(" ");
-				if ("addblock".equals(parts[0]) || "move".equals(parts[0])) {
+				if ("addblock".equals(parts[0]) || "move".equals(parts[0]) || "render".equals(parts[0])) {
 					try {
 						// Integer.parseInt() can throw an exception
 						if ("addblock".equals(parts[0])) {
@@ -60,12 +60,13 @@ public class GameServer extends Server {
 							if (null == game.getBlock(row, col)) {
 
 								// FIX FIX
+								
 
-								game.addBlock(row, col, val, BColor.NEUTRAL);
+								game.addBlock(row, col, val, BColor.BLUE);
 
 								// broadcast this move to both clients in this game
 								String response = "addblock " + row + " " + col + " " + val;
-								send(id, response);
+								// send(id, response);
 								send(otherPlayer.get(id), response);
 
 							} else {
@@ -85,12 +86,14 @@ public class GameServer extends Server {
 							}
 							game.nextPlayer();
 
-							// render grid???
 
 							// response
 							String response = "move " + dir;
-							send(id, response);
+							// send(id, response);
 							send(otherPlayer.get(id), response);
+						}
+						if ("render".equals(parts[0])) {
+							send(otherPlayer.get(id), "render");
 						}
 					} catch (Exception e) {
 						send(id, "error invalid request: [" + message + "]");
@@ -100,9 +103,9 @@ public class GameServer extends Server {
 					send(id, "error invalid request: [" + message + "]");
 					System.out.println(parts);
 				}
-			} else {
-				send(id, "error not your turn");
-			}
+			// } else {
+			// 	send(id, "error not your turn");
+			// }
 		} else {
 			send(id, "error game not found");
 		}

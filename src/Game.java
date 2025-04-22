@@ -117,10 +117,11 @@ public class Game {
                 for (int i = 0; i < GRID_HEIGHT; i++) {
                     grid[i][j] = result.get(i);
                 }
+
             }
 
             // for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-            spawnRandomBlock();
+            // spawnRandomBlock();
 
         } else if (dir == Direction.DOWN) {
             for (int j = 0; j < GRID_WIDTH; j++) {
@@ -139,7 +140,7 @@ public class Game {
                 }
             }
             // for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-            spawnRandomBlock();
+            // spawnRandomBlock();
 
         } else if (dir == Direction.LEFT) {
             for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -159,7 +160,7 @@ public class Game {
                 }
             }
             // for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-            spawnRandomBlock();
+            // spawnRandomBlock();
 
         } else if (dir == Direction.RIGHT) {
             for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -178,7 +179,7 @@ public class Game {
                 }
             }
             // for (int i = 0; i < BLOCKS_SPAWNED_PER_MOVE; i++)
-            spawnRandomBlock();
+            // spawnRandomBlock();
         }
 
     }
@@ -201,7 +202,7 @@ public class Game {
                 merges++;
             }
             if (merges > 0 && client != null) {
-                client.send("move " + dir);
+                // client.send("move " + dir);
             }
 
             stack.add(currentBlock);
@@ -222,7 +223,7 @@ public class Game {
         return empty.get(randomIndex);
     }
 
-    public void spawnRandomBlock() {
+    public Block spawnRandomBlock() {
         double spawnValue = Math.random();
         int value;
         if (spawnValue <= 0.7) {
@@ -236,9 +237,9 @@ public class Game {
         Coordinate g = getRandomEmptyTile();
         int row = g.getRow();
         int col = g.getCol();
-        grid[row][col] = new Block(value, BColor.BLUE, new Coordinate());
-        if (client != null)
-            client.send("addblock " + row + " " + col + " " + value);
+        grid[row][col] = new Block(value, BColor.BLUE, new Coordinate(row, col));
+
+        return grid[row][col];
     }
 
     public Block[][] getGrid() {
@@ -247,6 +248,10 @@ public class Game {
 
     public void setClient(GameClient client) {
         this.client = client;
+    }
+
+    public boolean isTurn() {
+        return myColor == currentPlayer;
     }
 
 }

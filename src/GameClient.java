@@ -47,7 +47,6 @@ public class GameClient extends Client {
             world.renderGrid();
 
         } else if ("move".equals(parts[0])) {
-            System.out.println("move " + parts[1]);
             String dir = parts[1];
             if ("UP".equals(dir)) {
                 game.merge(Direction.UP);
@@ -59,7 +58,6 @@ public class GameClient extends Client {
                 game.merge(Direction.RIGHT);
             }
             game.nextPlayer();
-            world.nextPlayer();
             world.renderGrid();
         } else if ("addblock".equals(parts[0])) {
             int row = Integer.parseInt(parts[1]);
