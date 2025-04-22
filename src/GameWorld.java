@@ -39,7 +39,12 @@ public class GameWorld extends World {
         addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
 
-        turnGraph = new TurnGraphic(game.getCurrentPlayer() == BColor.BLUE);
+        if (game.getMyColor() == BColor.BLUE) {
+            turnGraph = new TurnGraphic(BColor.BLUE);
+        } else {
+            turnGraph = new TurnGraphic(BColor.NEUTRAL);
+        }
+
         addObject(turnGraph, 40, 55);
 
         for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -123,6 +128,7 @@ public class GameWorld extends World {
                     client.send("move " + Direction.RIGHT);
                 }
                 game.nextPlayer();
+                turnGraph.setTurn(BColor.NEUTRAL);
                 int[] add = game.spawnRandomBlock();
                 renderGrid();
                 String message = "addblock " + add[0] + " " + add[1] + " " + add[2];

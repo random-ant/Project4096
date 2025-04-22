@@ -1,20 +1,22 @@
 import mayflower.*;
 
 public class TurnGraphic extends Actor {
-    private boolean blueTurn = true;
-    private MayflowerImage turnBlueImg, turnRedImg;
+    private MayflowerImage turnBlueImg, turnRedImg, turnNeutralImg;
 
-    public TurnGraphic(boolean blueTurn) {
-        this.blueTurn = blueTurn;
+    public TurnGraphic(BColor color) {
         turnBlueImg = new MayflowerImage("src/img/turnBoardBlue.png");
         turnRedImg = new MayflowerImage("src/img/turnBoardRed.png");
+        turnNeutralImg = new MayflowerImage("src/img/turnBoardNeutral.png");
         turnBlueImg.scale(201, 144);
         turnRedImg.scale(201, 144);
+        turnNeutralImg.scale(201, 144);
 
-        if (blueTurn) {
+        if (color == BColor.BLUE) {
             setImage(turnBlueImg);
-        } else {
+        } else if (color == BColor.RED) {
             setImage(turnRedImg);
+        } else {
+            setImage(turnNeutralImg);
         }
     }
 
@@ -24,13 +26,21 @@ public class TurnGraphic extends Actor {
      * @param blueTurn whether or not it is blue's turn
      * @return void
      */
-    public void setTurn(boolean blueTurn) {
-        this.blueTurn = blueTurn;
+    public void setTurn(BColor color) {
+        if (color == BColor.BLUE) {
+            setImage(turnBlueImg);
+        } else if (color == BColor.RED) {
+            setImage(turnRedImg);
+        } else {
+            setImage(turnNeutralImg);
+        }
+    }
 
-        if (blueTurn) {
+    public void setTurn(BColor color, boolean isTurn) {
+        if (isTurn) {
             setImage(turnBlueImg);
         } else {
-            setImage(turnRedImg);
+            setImage(turnNeutralImg);
         }
     }
 
