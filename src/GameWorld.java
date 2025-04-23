@@ -26,6 +26,9 @@ public class GameWorld extends World {
      */
     public static int BLOCK_WIDTH = 60, BLOCK_HEIGHT = 60;
 
+    public static int BLOCK_BORDER_WIDTH = (TILE_WIDTH - BLOCK_WIDTH) / 2, BLOCK_BORDER_HEIGHT = (TILE_HEIGHT
+            - BLOCK_HEIGHT) / 2;
+
     private TurnGraphic turnGraph;
     private int RED_SCORE = 0;
     private int BLUE_SCORE = 0;
@@ -51,6 +54,7 @@ public class GameWorld extends World {
         turnGraph = new TurnGraphic(turn);
         addObject(turnGraph, 40, 55);
 
+        // grid[0][0] = new Block(16, BColor.BLUE);
         grid[1][0] = new Block(2, BColor.BLUE);
         grid[2][0] = new Block(2, BColor.BLUE);
         grid[3][0] = new Block(4, BColor.BLUE);
@@ -59,6 +63,8 @@ public class GameWorld extends World {
 
         spawnRandomBlocks(10);
         renderGrid();
+
+        Mayflower.showBounds(true);
     }
 
     /**
@@ -79,8 +85,8 @@ public class GameWorld extends World {
     private void renderGrid() {
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
-                int x_coord = (j * TILE_WIDTH) + OFFSET_X;
-                int y_coord = (i * TILE_HEIGHT) + OFFSET_Y;
+                int[] converted = convertToPixels(new Coordinate(i, j));
+                int x_coord = converted[0], y_coord = converted[1];
 
                 // add base tiles
                 addObject(new Tile(), x_coord, y_coord);
@@ -88,31 +94,45 @@ public class GameWorld extends World {
                 // add blocks
                 Block currBlock = grid[i][j];
                 if (currBlock != null) {
-                    addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2,
-                            y_coord + (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
+                    addObject(currBlock, x_coord + BLOCK_BORDER_WIDTH, y_coord + BLOCK_BORDER_HEIGHT);
+                    System.out.println("added block " + currBlock.getValue() + " at " + (x_coord + BLOCK_BORDER_WIDTH)
+                            + ", " + (y_coord
+                                    + BLOCK_BORDER_HEIGHT));
                 }
             }
         }
 
         // spawn top walls
         for (Coordinate c : topWalls) {
-            int x_coord = (c.getCol() * TILE_WIDTH) + OFFSET_X;
-            int y_coord = (c.getRow() * TILE_HEIGHT) + OFFSET_Y;
-            addObject(new HorizontalWall(), x_coord - (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord - (TILE_HEIGHT
-                    - BLOCK_HEIGHT) / 2);
+            int[] converted = convertToPixels(c);
+            int x_coord = converted[0], y_coord = converted[1];
+            addObject(new HorizontalWall(), x_coord - BLOCK_BORDER_WIDTH, y_coord - BLOCK_BORDER_HEIGHT);
         }
 
         // spawn left walls
         for (Coordinate c : leftWalls) {
-            int x_coord = (c.getCol() * TILE_WIDTH) + OFFSET_X;
-            int y_coord = (c.getRow() * TILE_HEIGHT) + OFFSET_Y;
-            addObject(new VerticalWall(), x_coord - (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord - (TILE_HEIGHT
-                    - BLOCK_HEIGHT) / 2);
+            int[] converted = convertToPixels(c);
+            int x_coord = converted[0], y_coord = converted[1];
+            addObject(new VerticalWall(), x_coord - BLOCK_BORDER_WIDTH, y_coord - BLOCK_BORDER_HEIGHT);
         }
 
         // update score text
         showText("score blue: " + BLUE_SCORE, 550, 55, Color.BLACK);
         showText("score red: " + RED_SCORE, 550, 110, Color.BLACK);
+    }
+
+    /**
+     * Converts a coordinate in the grid to a pixel coordinate on the screen.
+     * 
+     * @param c the {@code Coordinate} representation of the position in the grid to
+     *          convert.
+     * @return an array of pixel coordinates. The first element is the X coordinate,
+     *         and the second element is the Y coordinate.
+     */
+    public int[] convertToPixels(Coordinate c) {
+        int col_coord = (c.getCol() * TILE_WIDTH) + OFFSET_X;
+        int row_coord = (c.getRow() * TILE_HEIGHT) + OFFSET_Y;
+        return new int[] { col_coord, row_coord };
     }
 
     /**
@@ -128,7 +148,7 @@ public class GameWorld extends World {
     @Override
     public void act() {
         int BLOCKS_SPAWNED_PER_MOVE = 3;
-        double ANIMATION_TIME = 150;
+        double ANIMATION_TIME = 10;
 
         // listen for key presses and act accordingly
         if (keyPresssed(Keyboard.KEY_UP)) {
@@ -150,10 +170,11 @@ public class GameWorld extends World {
                             if (b == null)
                                 continue;
 
-                            double x0 = b.getY();
-                            double xf = b.getTargetDestination().getRow() * TILE_HEIGHT + OFFSET_Y
-                                    + (TILE_HEIGHT - BLOCK_HEIGHT) / 2;
-                            double acceleration = 2 * (xf - x0) / (ANIMATION_TIME * ANIMATION_TIME);
+                            double initialPos = b.getY();
+                            double finalPos = convertToPixels(b.getTargetDestination())[1] + BLOCK_BORDER_HEIGHT;
+                            double acceleration = 2 * (finalPos - initialPos) / (ANIMATION_TIME * ANIMATION_TIME);
+
+                            System.out.println(initialPos + " " + finalPos + " | " + acceleration);
 
                             b.setAy(acceleration);
                         }
