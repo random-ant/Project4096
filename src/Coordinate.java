@@ -1,56 +1,64 @@
+/**
+ * Represents a coordinate in the game grid with a row and column.
+ */
 public class Coordinate {
     private int row;
     private int col;
 
+    /**
+     * Constructs a Coordinate with the specified row and column.
+     * 
+     * @param row The row index.
+     * @param col The column index.
+     */
     public Coordinate(int row, int col) {
         this.row = row;
         this.col = col;
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + row;
-        result = prime * result + col;
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Coordinate other = (Coordinate) obj;
-        if (row != other.row)
-            return false;
-        if (col != other.col)
-            return false;
-        return true;
-    }
-
+    /**
+     * Retrieves the row index of the coordinate.
+     * 
+     * @return The row index.
+     */
     public int getRow() {
         return row;
     }
 
+    /**
+     * Sets the row index of the coordinate.
+     * 
+     * @param row The new row index.
+     */
     public void setRow(int row) {
         this.row = row;
     }
 
+    /**
+     * Retrieves the column index of the coordinate.
+     * 
+     * @return The column index.
+     */
     public int getCol() {
         return col;
     }
 
+    /**
+     * Sets the column index of the coordinate.
+     * 
+     * @param col The new column index.
+     */
     public void setCol(int col) {
         this.col = col;
     }
 
+    /**
+     * Returns a string representation of the coordinate.
+     * 
+     * @return A string in the format "(row, col)".
+     */
     @Override
     public String toString() {
         return "(" + row + ", " + col + ")";
     }
-
 }

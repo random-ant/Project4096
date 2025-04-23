@@ -7,34 +7,40 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+/**
+ * Represents the server for the game, handling client connections, game logic,
+ * and communication between clients.
+ */
 public class GameServer extends Server {
 	private Queue<Integer> clientsWaitingForGame;
 	private Map<Integer, Game> games;
 	private Map<Integer, Integer> otherPlayer;
 	private Set<Integer> blueClients, redClients;
 
+	/**
+	 * Constructs a GameServer that listens for client connections on the specified
+	 * port.
+	 * 
+	 * @param port The port number to listen on.
+	 */
 	public GameServer(int port) {
 		super(port, true);
 
-		clientsWaitingForGame = new LinkedList<Integer>();
-		games = new HashMap<Integer, Game>();
-		otherPlayer = new HashMap<Integer, Integer>();
-		blueClients = new HashSet<Integer>();
-		redClients = new HashSet<Integer>();
+		clientsWaitingForGame = new LinkedList<>();
+		games = new HashMap<>();
+		otherPlayer = new HashMap<>();
+		blueClients = new HashSet<>();
+		redClients = new HashSet<>();
 
 		System.out.println("Waiting for clients on port " + getPort() + " at " + getIP());
-
 	}
 
-	/*
-	 * Do something with a message sent from a client
-	 *
-	 * Allowed Messages:
-	 * play row col
+	/**
+	 * Processes a message sent from a client.
+	 * 
+	 * @param id      The ID of the client sending the message.
+	 * @param message The message sent by the client.
 	 */
-
-	// FIX FIX FIX FIX
-
 	public void process(int id, String message) {
 		System.out.println("Message from client " + id + ": " + message);
 		// get this client's game
@@ -114,20 +120,20 @@ public class GameServer extends Server {
 		}
 	}
 
-	/*
-	 * Do something when a client connects.
-	 *
-	 * For every 2nd client that connects:
-	 * 1. Create a new TicTacToe game for these clients
-	 * 2. Randomly assign each client X or O
-	 * 3. Assign clientId -> TicTacToe game in clientGames map
+	/**
+	 * Handles the event when a client joins the server.
+	 * 
+	 * @param id The ID of the client that joined.
 	 */
 	public void onJoin(int id) {
-		// add new client to the game queue
 		System.out.println("Client connected: " + id);
 		send(id, "join");
 	}
 
+	/**
+	 * Starts a new game if there are at least two clients waiting.
+	 * Matches two clients, assigns colors, and initializes the game.
+	 */
 	public void startNew() {
 		System.out.println("start new");
 		// If there are at least 2 clients waiting for a game...
@@ -180,10 +186,11 @@ public class GameServer extends Server {
 		}
 	}
 
-	/*
-	 * Do something when a client disconnects
-	 *
-	 * End the game, make the other player the winner!
+	/**
+	 * Handles the event when a client disconnects from the server.
+	 * Ends the game and notifies the other player of the disconnection.
+	 * 
+	 * @param id The ID of the client that disconnected.
 	 */
 	public void onExit(int id) {
 		System.out.println("Client disconnected: " + id);
@@ -202,6 +209,12 @@ public class GameServer extends Server {
 		}
 	}
 
+	/**
+	 * Ends the game for the specified clients and cleans up associated data.
+	 * 
+	 * @param clientA The ID of the first client.
+	 * @param clientB The ID of the second client.
+	 */
 	private void endGame(int clientA, int clientB) {
 		// disconnect both clients
 		disconnect(clientA);

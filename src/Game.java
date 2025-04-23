@@ -5,6 +5,11 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.Stack;
 
+/**
+ * Represents the main game logic for a grid-based game. The game involves two players
+ * (BLUE and RED) who take turns adding and merging blocks on a grid. The game also
+ * includes walls that restrict block movement and merging.
+ */
 public class Game {
     int GRID_WIDTH = 10;
     int GRID_HEIGHT = 10;
@@ -21,22 +26,37 @@ public class Game {
      */
     private Set<Coordinate> topWalls, leftWalls;
 
+    /**
+     * @return The current score of the BLUE player.
+     */
     public int getBlueScore() {
         return blueScore;
     }
 
+    /**
+     * @return The current score of the RED player.
+     */
     public int getRedScore() {
         return redScore;
     }
 
+    /**
+     * @return The set of coordinates representing the top walls of the grid.
+     */
     public Set<Coordinate> getTopWalls() {
         return topWalls;
     }
 
+    /**
+     * @return The set of coordinates representing the left walls of the grid.
+     */
     public Set<Coordinate> getLeftWalls() {
         return leftWalls;
     }
 
+    /**
+     * Initializes a new game instance with a grid, walls, and default settings.
+     */
     public Game() {
         this.grid = new Block[GRID_HEIGHT][GRID_WIDTH];
         this.currentPlayer = BColor.BLUE;
@@ -46,16 +66,18 @@ public class Game {
     }
 
     /**
-     * Adds walls to the grid. This method should be called when the game world is
-     * first created.
-     * 
-     * @return void
+     * Adds walls to the grid. This method is called during game initialization.
      */
     private void addWalls() {
         topWalls.add(new Coordinate(4, 0));
         leftWalls.add(new Coordinate(0, 3));
     }
 
+    /**
+     * Creates a copy of the current game state.
+     * 
+     * @return A new Game object with the same state as the current game.
+     */
     public Game copy() {
         Game copy = new Game();
         for (int r = 0; r < this.grid.length; r++) {
@@ -75,14 +97,25 @@ public class Game {
         myColor = color;
     }
 
+    /**
+     * @return The color representing the current player.
+     */
     public BColor getCurrentPlayer() {
         return currentPlayer;
     }
 
+    /**
+     * Sets the current player.
+     * 
+     * @param player The color of the player to set as the current player.
+     */
     public void setCurrentPlayer(BColor player) {
         currentPlayer = player;
     }
 
+    /**
+     * Switches the turn to the next player.
+     */
     public void nextPlayer() {
         if (this.currentPlayer == BColor.BLUE) {
             this.currentPlayer = BColor.RED;
@@ -91,10 +124,27 @@ public class Game {
         }
     }
 
+    /**
+     * Adds a block to the grid at the specified position with the current player's color.
+     * 
+     * @param row   The row index of the block.
+     * @param col   The column index of the block.
+     * @param value The value of the block.
+     * @return True if the block was successfully added, false otherwise.
+     */
     public boolean addBlock(int row, int col, int value) {
         return addBlock(row, col, value, currentPlayer);
     }
 
+    /**
+     * Adds a block to the grid at the specified position with the specified player's color.
+     * 
+     * @param row   The row index of the block.
+     * @param col   The column index of the block.
+     * @param value The value of the block.
+     * @param color The color of the block.
+     * @return True if the block was successfully added, false otherwise.
+     */
     public boolean addBlock(int row, int col, int value, BColor color) {
         if (null != getBlock(row, col)) {
             return false;
@@ -106,10 +156,24 @@ public class Game {
         return true;
     }
 
+    /**
+     * Sets a block at the specified position in the grid.
+     * 
+     * @param row   The row index of the block.
+     * @param col   The column index of the block.
+     * @param block The block to set.
+     */
     public void setBlock(int row, int col, Block block) {
         this.grid[row][col] = block;
     }
 
+    /**
+     * Retrieves the block at the specified position in the grid.
+     * 
+     * @param row The row index of the block.
+     * @param col The column index of the block.
+     * @return The block at the specified position, or null if the position is empty or invalid.
+     */
     public Block getBlock(int row, int col) {
         if ((row < 0) || (col < 0) || (row >= GRID_HEIGHT) || (GRID_WIDTH >= 3)) {
             return null;
@@ -117,6 +181,11 @@ public class Game {
         return this.grid[row][col];
     }
 
+    /**
+     * Checks if there is any empty space in the grid.
+     * 
+     * @return True if there is at least one empty space, false otherwise.
+     */
     public boolean hasEmptySpace() {
         for (int r = 0; r < this.grid.length; r++) {
             for (int c = 0; c < this.grid[r].length; c++) {
@@ -128,6 +197,11 @@ public class Game {
         return false;
     }
 
+    /**
+     * Retrieves a list of coordinates representing all empty tiles in the grid.
+     * 
+     * @return A list of coordinates of empty tiles.
+     */
     public ArrayList<Coordinate> getEmptyTiles() {
         ArrayList<Coordinate> out = new ArrayList<Coordinate>(GRID_HEIGHT * GRID_WIDTH);
         for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -144,8 +218,7 @@ public class Game {
      * Merges blocks in the given array. The blocks are merged from left to right.
      * Elements will always be merged to the largest possible element.
      * 
-     * @param dir The direction in which to merge.
-     * @return void
+     * @param dir The direction in which to merge blocks.
      */
     public void merge(Direction dir) {
         int BLOCKS_SPAWNED_PER_MOVE = 10;
@@ -271,7 +344,13 @@ public class Game {
 
     }
 
-    // Get list of arrays
+    /**
+     * Processes a list of blocks and merges them according to the game rules.
+     * 
+     * @param blocks The list of blocks to process.
+     * @param dir    The direction of the merge.
+     * @return A list of blocks after merging.
+     */
     public ArrayList<Block> check(ArrayList<Block> blocks, Direction dir) {
         Stack<Block> stack = new Stack<Block>();
 
@@ -359,6 +438,11 @@ public class Game {
         return result;
     }
 
+    /**
+     * Retrieves a random empty tile from the grid.
+     * 
+     * @return A coordinate representing a random empty tile.
+     */
     public Coordinate getRandomEmptyTile() {
         ArrayList<Coordinate> empty = getEmptyTiles();
         int numEmpty = empty.size();
@@ -366,6 +450,11 @@ public class Game {
         return empty.get(randomIndex);
     }
 
+    /**
+     * Spawns a random block on the grid with a random value (2, 4, or 8).
+     * 
+     * @return An array containing the row, column, and value of the spawned block.
+     */
     public int[] spawnRandomBlock() {
         double spawnValue = Math.random();
         int value;
@@ -386,14 +475,27 @@ public class Game {
         return ret;
     }
 
+    /**
+     * @return The current state of the grid as a 2D array of blocks.
+     */
     public Block[][] getGrid() {
         return grid;
     }
 
+    /**
+     * Sets the game client for this game instance.
+     * 
+     * @param client The GameClient to associate with this game.
+     */
     public void setClient(GameClient client) {
         this.client = client;
     }
 
+    /**
+     * Checks if it is the current player's turn.
+     * 
+     * @return True if it is the current player's turn, false otherwise.
+     */
     public boolean isTurn() {
         return myColor == currentPlayer;
     }
