@@ -354,6 +354,8 @@ public class Game {
         while (!stack.empty())
             result.add(stack.pop());
 
+        Collections.reverse(result);
+
         return result;
     }
 
