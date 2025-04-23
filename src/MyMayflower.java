@@ -4,9 +4,9 @@ public class MyMayflower extends Mayflower {
    // public MyMayflower() {
    // this("Game", 800, 1000, new GameWorld()));
    // }
-   private GameWorld world;
+   private World world;
 
-   public MyMayflower(String title, int width, int height, GameWorld world) {
+   public MyMayflower(String title, int width, int height, World world) {
       super(title, width, height);
       this.world = world;
       Mayflower.setWorld(this.world);

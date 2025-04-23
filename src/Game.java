@@ -8,6 +8,8 @@ import java.util.Stack;
 public class Game {
     int GRID_WIDTH = 10;
     int GRID_HEIGHT = 10;
+    int blueScore = 0;
+    int redScore = 0;
     Block[][] grid;
     BColor currentPlayer;
     BColor myColor;
@@ -18,6 +20,14 @@ public class Game {
      * the block it is relative to.
      */
     private Set<Coordinate> topWalls, leftWalls;
+
+    public int getBlueScore() {
+        return blueScore;
+    }
+
+    public int getRedScore() {
+        return redScore;
+    }
 
     public Set<Coordinate> getTopWalls() {
         return topWalls;
@@ -184,8 +194,8 @@ public class Game {
 
                     if (topWalls.contains(new Coordinate(i, j)) || i == 0) {
                         ArrayList<Block> toAdd = check(col, dir);
-                        // add empty blocks
                         result.addAll(toAdd);
+                        // add empty blocks
                         result.addAll(Arrays.asList(new Block[GRID_HEIGHT - i - result.size()]));
 
                         col.clear();
@@ -270,26 +280,70 @@ public class Game {
             if (currentBlock == null)
                 continue;
 
-            currentBlock.setColor(BColor.RED);
-            int merges = 0;
-            while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
-                Block top = stack.pop();
-                Block newBlock = new Block(top.getValue() * 2, BColor.RED);
-                currentBlock = newBlock;
-                merges++;
+            // two blocks have same value
 
-                // FIX SCORE
+            if (!stack.empty()) {
+                boolean sameValue = stack.peek().getValue() == currentBlock.getValue();
 
-                // if (game.isTurn()) { // if BLUE's turn
-                // newColor = BColor.BLUE;
-                // BLUE_SCORE += newValue;
-                // } else {
-                // newColor = BColor.RED;
-                // RED_SCORE += newValue;
-                // }
-            }
-            if (merges > 0 && client != null) {
-                // client.send("move " + dir);
+                // if they have the same value, get the value
+                // if not, ensure that lessThan64 is false
+                int value;
+                if (sameValue) {
+                    value = currentBlock.getValue();
+                } else {
+                    value = 64;
+                }
+
+                // if the identical value is 64. If not identical, false
+                boolean lessThan64 = value < 64;
+
+                // if the blocks are the same color
+                boolean sameColor = stack.peek().getColor() == currentBlock.getColor();
+
+                /*
+                 * only combine if:
+                 * blocks have same value
+                 * AND
+                 * block value is less than 64 (steal block from other team if different color)
+                 * OR
+                 * the blocks have the same value (combine even if value greater than 64)
+                 * 
+                 * do not combine if the blocks are different colors and value >= 64
+                 */
+                while (!stack.empty() && sameValue && (lessThan64 || sameColor)) {
+                    Block top = stack.pop();
+                    Block newBlock = new Block(top.getValue() * 2, currentPlayer);
+                    currentBlock = newBlock;
+
+                    if (!stack.empty()) {
+                        sameValue = stack.peek().getValue() == currentBlock.getValue();
+                        sameColor = stack.peek().getColor() == currentBlock.getColor();
+                    }
+
+                    if (sameValue) {
+                        value = currentBlock.getValue();
+                    } else {
+                        value = 64;
+                    }
+                    lessThan64 = value < 64;
+
+                    // FIX SCORE
+
+                    if (currentPlayer == BColor.BLUE) {
+                        blueScore += value;
+                    } else {
+                        redScore += value;
+                    }
+
+                    // if (game.isTurn()) { // if BLUE's turn
+                    // newColor = BColor.BLUE;
+                    // BLUE_SCORE += newValue;
+                    // } else {
+                    // newColor = BColor.RED;
+                    // RED_SCORE += newValue;
+                    // }
+                }
+
             }
 
             stack.add(currentBlock);
@@ -299,6 +353,8 @@ public class Game {
         // add stack elements to result array
         while (!stack.empty())
             result.add(stack.pop());
+
+        Collections.reverse(result);
 
         return result;
     }
@@ -324,7 +380,7 @@ public class Game {
         Coordinate g = getRandomEmptyTile();
         int row = g.getRow();
         int col = g.getCol();
-        grid[row][col] = new Block(value, BColor.BLUE);
+        grid[row][col] = new Block(value, BColor.NEUTRAL);
 
         int[] ret = { row, col, value };
         return ret;
