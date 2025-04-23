@@ -8,19 +8,18 @@ public class GameClient extends Client {
     private Game game;
 
     public GameClient() {
-        // Scanner in = new Scanner(System.in);
-        // System.out.println("Use localhost to connect to a server running on your
-        // computer.");
-        // System.out.print("IP Address > ");
-        // String ip = in.next();
+        Scanner in = new Scanner(System.in);
+        System.out.println("Use localhost to connect to a server running on your computer.");
+        System.out.print("IP Address > ");
+        String ip = in.next();
 
         // System.out.print("Port > ");
         // int port = in.nextInt();
         int port = 1234; // default server port
 
         // System.out.println("Connecting...");
-        // connect(ip, port);
-        connect("localhost", port);
+        connect(ip, port);
+        // connect("localhost", port);
 
         // in.close();
     }
