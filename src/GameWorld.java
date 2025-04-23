@@ -41,6 +41,8 @@ public class GameWorld extends World {
      */
     public static boolean turn;
 
+    private Set<Block> currentlyMovingBlocks = new HashSet<Block>();
+
     public GameWorld() {
         grid = new Block[GRID_HEIGHT][GRID_WIDTH];
         topWalls = new HashSet<Coordinate>();
@@ -62,9 +64,8 @@ public class GameWorld extends World {
         grid[5][0] = new Block(2, BColor.BLUE);
 
         spawnRandomBlocks(10);
+        renderBaseGrid();
         renderGrid();
-
-        Mayflower.showBounds(true);
     }
 
     /**
@@ -74,31 +75,22 @@ public class GameWorld extends World {
      * @return void
      */
     private void addWalls() {
-        // topWalls.add(new Coordinate(4, 0));
-        // leftWalls.add(new Coordinate(0, 3));
+        topWalls.add(new Coordinate(4, 0));
+        leftWalls.add(new Coordinate(0, 3));
     }
 
     /**
-     * Renders the grid. Inclues all tiles, blocks, walls in the grid, plus the
-     * score text. Should be called whenever game state is changed.
+     * Renders the base grid. This includes all tiles and walls in the grid. This
+     * method should be called when the game world is first created.
      */
-    private void renderGrid() {
+    private void renderBaseGrid() {
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 int[] converted = convertToPixels(new Coordinate(i, j));
                 int x_coord = converted[0], y_coord = converted[1];
 
-                // add base tiles
+                // add tiles
                 addObject(new Tile(), x_coord, y_coord);
-
-                // add blocks
-                Block currBlock = grid[i][j];
-                if (currBlock != null) {
-                    addObject(currBlock, x_coord + BLOCK_BORDER_WIDTH, y_coord + BLOCK_BORDER_HEIGHT);
-                    System.out.println("added block " + currBlock.getValue() + " at " + (x_coord + BLOCK_BORDER_WIDTH)
-                            + ", " + (y_coord
-                                    + BLOCK_BORDER_HEIGHT));
-                }
             }
         }
 
@@ -115,6 +107,25 @@ public class GameWorld extends World {
             int x_coord = converted[0], y_coord = converted[1];
             addObject(new VerticalWall(), x_coord - BLOCK_BORDER_WIDTH, y_coord - BLOCK_BORDER_HEIGHT);
         }
+    }
+
+    /**
+     * Renders the grid. Inclues only blocks in the grid, plus the score text.
+     * Should be called whenever game state is changed.
+     */
+    public void renderGrid() {
+        for (int i = 0; i < GRID_HEIGHT; i++) {
+            for (int j = 0; j < GRID_WIDTH; j++) {
+                int[] converted = convertToPixels(new Coordinate(i, j));
+                int x_coord = converted[0], y_coord = converted[1];
+
+                // add blocks
+                Block currBlock = grid[i][j];
+                if (currBlock != null) {
+                    addObject(currBlock, x_coord + BLOCK_BORDER_WIDTH, y_coord + BLOCK_BORDER_HEIGHT);
+                }
+            }
+        }
 
         // update score text
         showText("score blue: " + BLUE_SCORE, 550, 55, Color.BLACK);
@@ -129,37 +140,50 @@ public class GameWorld extends World {
      * @return an array of pixel coordinates. The first element is the X coordinate,
      *         and the second element is the Y coordinate.
      */
-    public int[] convertToPixels(Coordinate c) {
+    public static int[] convertToPixels(Coordinate c) {
         int col_coord = (c.getCol() * TILE_WIDTH) + OFFSET_X;
         int row_coord = (c.getRow() * TILE_HEIGHT) + OFFSET_Y;
         return new int[] { col_coord, row_coord };
     }
 
+    public static double[] calculateBlockPixel(Coordinate c) {
+        double x = (c.getCol() * TILE_WIDTH) + OFFSET_X + BLOCK_BORDER_WIDTH;
+        double y = (c.getRow() * TILE_HEIGHT) + OFFSET_Y + BLOCK_BORDER_HEIGHT;
+        return new double[] { x, y };
+    }
+
     /**
      * Swaps who can make a move. Updates turn graphic accordingly.
-     * 
-     * @return void
      */
     private void swapActivePlayer() {
         turn = !turn;
         turnGraph.setTurn(turn);
     }
 
+    public void removeMovingBlock(Block b) {
+        currentlyMovingBlocks.remove(b);
+        System.out.println(currentlyMovingBlocks.size());
+        if (currentlyMovingBlocks.isEmpty()) {
+            renderGrid();
+        }
+    }
+
     @Override
     public void act() {
         int BLOCKS_SPAWNED_PER_MOVE = 3;
-        double ANIMATION_TIME = 10;
+        double ANIMATION_TIME = 8.5;
 
         // listen for key presses and act accordingly
         if (keyPresssed(Keyboard.KEY_UP)) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 ArrayList<Block> col = new ArrayList<Block>();
                 ArrayList<Block> result = new ArrayList<Block>();
+                int startOfChain = 0;
 
                 for (int i = 0; i <= GRID_HEIGHT; i++) {
                     // when there's a wall, merge what we already have
                     if (topWalls.contains(new Coordinate(i, j)) || i == GRID_HEIGHT) {
-                        ArrayList<Block> toAdd = merge(col, true, j);
+                        ArrayList<Block> toAdd = mergeLine(col, true, j, startOfChain);
                         result.addAll(toAdd);
 
                         // add empty blocks
@@ -167,7 +191,7 @@ public class GameWorld extends World {
 
                         // update velocities of blocks
                         for (Block b : col) {
-                            if (b == null)
+                            if (b == null || b.getTargetDestination() == null)
                                 continue;
 
                             double initialPos = b.getY();
@@ -177,10 +201,15 @@ public class GameWorld extends World {
                             System.out.println(initialPos + " " + finalPos + " | " + acceleration);
 
                             b.setAy(acceleration);
+                            currentlyMovingBlocks.add(b);
+
+                            System.out.println((b.getY() - BLOCK_BORDER_HEIGHT) + " "
+                                    + convertToPixels(b.getTargetDestination())[1]);
                         }
 
                         // reset for the next batch
                         col.clear();
+                        startOfChain = i;
                     }
 
                     if (i < GRID_HEIGHT) {
@@ -208,7 +237,7 @@ public class GameWorld extends World {
         // col.add(grid[i][j]);
 
         // if (topWalls.contains(new Coordinate(i, j)) || i == 0) {
-        // ArrayList<Block> toAdd = merge(col);
+        // ArrayList<Block> toAdd = mergeLine(col);
         // // add empty blocks
         // result.addAll(toAdd);
         // result.addAll(Arrays.asList(new Block[GRID_HEIGHT - i - result.size()]));
@@ -229,14 +258,15 @@ public class GameWorld extends World {
         // renderGrid();
         // swapActivePlayer();
 
-        // } else if (keyPresssed(Keyboard.KEY_LEFT)) {
+        // }
+        // else if (keyPresssed(Keyboard.KEY_LEFT)) {
         // for (int i = 0; i < GRID_HEIGHT; i++) {
         // ArrayList<Block> row = new ArrayList<Block>();
         // ArrayList<Block> result = new ArrayList<Block>();
 
         // for (int j = 0; j <= GRID_WIDTH; j++) {
         // if (leftWalls.contains(new Coordinate(i, j)) || j == GRID_WIDTH) {
-        // ArrayList<Block> toAdd = merge(row);
+        // ArrayList<Block> toAdd = mergeLine(row);
         // result.addAll(toAdd);
         // // add empty blocks
         // result.addAll(Arrays.asList(new Block[j - result.size()]));
@@ -267,7 +297,7 @@ public class GameWorld extends World {
         // row.add(grid[i][j]);
 
         // if (leftWalls.contains(new Coordinate(i, j)) || j == 0) {
-        // ArrayList<Block> toAdd = merge(row);
+        // ArrayList<Block> toAdd = mergeLine(row);
         // result.addAll(toAdd);
         // // add empty blocks
         // result.addAll(Arrays.asList(new Block[GRID_WIDTH - j - result.size()]));
@@ -294,12 +324,18 @@ public class GameWorld extends World {
      * Merges blocks in the given array. The blocks are merged from left to right.
      * Elements will always be merged to the largest possible element.
      * 
-     * @param blocks The line of blocks to merge. Any {@code null} values are
-     *               considered empty tiles.
+     * @param blocks      The line of blocks to merge. Any {@code null} values are
+     *                    considered empty tiles.
+     * @param isVertical  Whether or not the blocks are moving vertically or not.
+     * @param lineIndex   The index of the line in the larger grid that is being
+     *                    merged.
+     * @param offsetIndex The index of how far up the line the merge starts. This is
+     *                    used for when we merge multiple times in one
+     *                    row/col because of walls.
      * @return An {@code ArrayList} of merged blocks. All empty blocks will have
      *         been removed.
      */
-    public ArrayList<Block> merge(ArrayList<Block> blocks, boolean isVertical, int index) {
+    public ArrayList<Block> mergeLine(ArrayList<Block> blocks, boolean isVertical, int lineIndex, int offsetIndex) {
         Stack<Block> stack = new Stack<Block>();
         // index in row -> new index in row
         Map<Integer, Integer> positionShifts = new HashMap<Integer, Integer>();
@@ -345,11 +381,13 @@ public class GameWorld extends World {
                 continue;
 
             Block b = blocks.get(i);
-            int target = positionShifts.get(i);
-            if (isVertical) {
-                b.setTargetDestination(new Coordinate(target, index));
+            int target = positionShifts.get(i) + offsetIndex;
+            if (target == i + offsetIndex) // if the block is already in the right place
+                b.setTargetDestination(null);
+            else if (isVertical) {
+                b.setTargetDestination(new Coordinate(target, lineIndex));
             } else {
-                b.setTargetDestination(new Coordinate(index, target));
+                b.setTargetDestination(new Coordinate(lineIndex, target));
             }
         }
 

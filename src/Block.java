@@ -1,5 +1,4 @@
-import mayflower.Actor;
-import mayflower.MayflowerImage;
+import mayflower.*;
 
 public class Block extends Actor {
 
@@ -12,6 +11,7 @@ public class Block extends Actor {
     public Block(int value, BColor color) {
         this.value = value;
         this.color = color;
+        this.targetDestination = null;
         vx = vy = ax = ay = 0;
 
         if (color == BColor.NEUTRAL) {
@@ -38,6 +38,17 @@ public class Block extends Actor {
         vx += ax;
         vy += ay;
         setLocation(getX() + vx, getY() + vy);
+
+        if ((vy < 0 && getY() <= GameWorld.convertToPixels(this.targetDestination)[1])) {
+            vy = 0;
+            ay = 0;
+            double[] blockPixel = GameWorld.calculateBlockPixel(this.targetDestination);
+            setLocation(blockPixel[0], blockPixel[1]);
+
+            GameWorld w = (GameWorld) getWorld();
+            w.removeMovingBlock(this);
+            w.removeObject(this);
+        }
     }
 
     public Coordinate getTargetDestination() {

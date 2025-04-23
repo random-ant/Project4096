@@ -1,7 +1,7 @@
 import mayflower.*;
 
 public class TurnGraphic extends Actor {
-    private boolean blueTurn = true;
+    private boolean blueTurn;
     private MayflowerImage turnBlueImg, turnRedImg;
 
     public TurnGraphic(boolean blueTurn) {
