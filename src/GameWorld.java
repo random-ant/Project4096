@@ -58,8 +58,6 @@ public class GameWorld extends World {
             }
         }
 
-        
-
         renderGrid();
     }
 
@@ -86,9 +84,9 @@ public class GameWorld extends World {
                 if (currBlock == null) {
                     addObject(new Tile(), x_coord, y_coord);
                 } else {
-                // add blocks
-                addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord +
-                        (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
+                    // add blocks
+                    addObject(currBlock, x_coord + (TILE_WIDTH - BLOCK_WIDTH) / 2, y_coord +
+                            (TILE_HEIGHT - BLOCK_HEIGHT) / 2);
                 }
             }
         }
@@ -110,8 +108,8 @@ public class GameWorld extends World {
         }
 
         // update score text
-        showText("score blue: " + BLUE_SCORE, 550, 55, Color.BLACK);
-        showText("score red: " + RED_SCORE, 550, 110, Color.BLACK);
+        showText("score blue: " + game.getBlueScore(), 550, 55, Color.BLACK);
+        showText("score red: " + game.getRedScore(), 550, 110, Color.BLACK);
     }
 
     @Override
@@ -134,13 +132,28 @@ public class GameWorld extends World {
                 }
                 game.nextPlayer();
                 turnGraph.setTurn(BColor.NEUTRAL);
-                int[] add = game.spawnRandomBlock();
-                renderGrid();
-                String message = "addblock " + add[0] + " " + add[1] + " " + add[2];
-                client.send(message);
-                client.send("render");
+                spawnRandomBlocksAndSend(2);
             }
         }
+    }
+
+    public void spawnRandomBlockAndSend() {
+        int[] add = game.spawnRandomBlock();
+        renderGrid();
+        String message = "addblock " + add[0] + " " + add[1] + " " + add[2];
+        client.send(message);
+        client.send("render");
+    }
+
+    public void spawnRandomBlocksAndSend(int numBlocks) {
+        int[][] add = new int[numBlocks][3];
+        for (int block = 0; block < numBlocks; block++) {
+            add[block] = game.spawnRandomBlock();
+            String message = "addblock " + add[block][0] + " " + add[block][1] + " " + add[block][2];
+            client.send(message);
+        }
+        renderGrid();
+        client.send("render");
     }
 
     private ArrayList<Coordinate> getEmptyTiles() {
@@ -153,31 +166,6 @@ public class GameWorld extends World {
             }
         }
         return out;
-    }
-
-    /**
-     * Spawn a certain amount of blocks into the grid. Blocks will be randomly
-     * placed into empty tiles. If there are no more empty tiles, nothing will
-     * happen.
-     * 
-     * @param numBlocks number of blocks to spawn in
-     */
-    public void spawnRandomBlocks(int numBlocks) {
-        double spawnValue = Math.random();
-        int value = -1;
-        if (spawnValue <= 0.7) // 70% chance
-            value = 2;
-        else if (spawnValue <= 0.9) // 20% chance
-            value = 4;
-        else // 10% chance
-            value = 8;
-
-        ArrayList<Coordinate> empty = getEmptyTiles();
-        Collections.shuffle(empty);
-        for (int i = 0; i < numBlocks && i < empty.size(); i++) {
-            Coordinate g = empty.get(i);
-            grid[g.getRow()][g.getCol()] = new Block(value, BColor.NEUTRAL);
-        }
     }
 
     /**

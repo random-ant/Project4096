@@ -40,6 +40,7 @@ public class GameServer extends Server {
 		// get this client's game
 		Game game = games.get(id);
 
+		String[] parts = message.trim().split(" ");
 		// check if client is in a game and if that game is not over
 		if (game != null) {
 			// check if it is this players turn
@@ -47,7 +48,6 @@ public class GameServer extends Server {
 			BColor curr = game.getCurrentPlayer();
 			// if (curr == player) {
 			// parse the row and col from the message
-			String[] parts = message.trim().split(" ");
 			if ("addblock".equals(parts[0]) || "move".equals(parts[0]) || "render".equals(parts[0])) {
 				try {
 					// Integer.parseInt() can throw an exception
@@ -104,6 +104,11 @@ public class GameServer extends Server {
 			// } else {
 			// send(id, "error not your turn");
 			// }
+		} else if (parts[0].equals("ready")) {
+			System.out.println("" + id + " ready");
+			if (!clientsWaitingForGame.contains(id))
+				clientsWaitingForGame.add(id);
+			startNew();
 		} else {
 			send(id, "error game not found");
 		}
@@ -119,9 +124,12 @@ public class GameServer extends Server {
 	 */
 	public void onJoin(int id) {
 		// add new client to the game queue
-		clientsWaitingForGame.add(id);
 		System.out.println("Client connected: " + id);
+		send(id, "join");
+	}
 
+	public void startNew() {
+		System.out.println("start new");
 		// If there are at least 2 clients waiting for a game...
 		if (clientsWaitingForGame.size() >= 2) {
 			// get the two clients that have been waiting the longest
@@ -158,9 +166,14 @@ public class GameServer extends Server {
 				send(clientA, "youare RED");
 			}
 
-			game.addBlock(1, 1, 2, BColor.NEUTRAL);
-			send(clientA, "addblock 1 1 2");
-			send(clientB, "addblock 1 1 2");
+			int INITIAL_BLOCKS = 2;
+			for (int i = 0; i < INITIAL_BLOCKS; i++) {
+				int[] block = game.spawnRandomBlock();
+				game.addBlock(block[0], block[1], block[2], BColor.NEUTRAL);
+				String message = "addblock " + block[0] + " " + block[1] + " " + block[2];
+				send(clientA, message);
+				send(clientB, message);
+			}
 			send(clientA, "render");
 			send(clientB, "render");
 

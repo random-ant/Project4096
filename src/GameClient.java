@@ -4,6 +4,7 @@ import mayflower.net.*;
 
 public class GameClient extends Client {
     private GameWorld world;
+    private StartWorld start;
     private Game game;
 
     public GameClient() {
@@ -33,25 +34,23 @@ public class GameClient extends Client {
 
         String[] parts = message.split(" ");
 
-        if ("youare".equals(parts[0])) {
+        if ("join".equals(parts[0])) {
+            System.out.println("hi!");
+
+            start = new StartWorld(this, game);
+
+            new MyMayflower("game", 800, 1000, start);
+
+        } else if ("youare".equals(parts[0])) {
             BColor player = "BLUE".equals(parts[1]) ? BColor.BLUE : BColor.RED;
 
             game = new Game();
             game.setClient(this);
             game.setMyColor(player);
 
-            world = new GameWorld(this, game);
-            
-            if (player == BColor.BLUE)
-                world.getTurnGraph().setTurn(BColor.BLUE);
-            else
-                world.getTurnGraph().setTurn(BColor.NEUTRAL);
+            start.setGame(game);
 
-
-            new MyMayflower("game", 800, 1000, world);
-
-            world.renderGrid();
-
+            world = start.startGame();
         } else if ("move".equals(parts[0])) {
             String dir = parts[1];
             if ("UP".equals(dir)) {
@@ -71,7 +70,7 @@ public class GameClient extends Client {
             int col = Integer.parseInt(parts[2]);
             int val = Integer.parseInt(parts[3]);
             if (game.getBlock(row, col) == null) {
-                game.addBlock(row, col, val, BColor.BLUE);
+                game.addBlock(row, col, val, BColor.NEUTRAL);
             }
         } else if ("render".equals(parts[0])) {
             world.renderGrid();
