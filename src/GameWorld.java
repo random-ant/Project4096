@@ -180,6 +180,7 @@ public class GameWorld extends World {
 
             spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
             swapActivePlayer();
+            printGrid();
             renderGrid();
         }
     }
@@ -283,38 +284,36 @@ public class GameWorld extends World {
                     grid[i][j] = result.get(j);
                 }
             }
+        } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
+            for (int i = 0; i < GRID_HEIGHT; i++) {
+                ArrayList<Block> row = new ArrayList<Block>();
+                ArrayList<Block> result = new ArrayList<Block>();
+                int startOfChain = GRID_WIDTH;
 
+                for (int j = GRID_WIDTH - 1; j >= 0; j--) {
+                    row.add(grid[i][j]);
+
+                    if (leftWalls.contains(new Coordinate(i, j)) || j == 0) {
+                        ArrayList<Block> toAdd = mergeLine(row, i, startOfChain, false, true);
+                        result.addAll(toAdd);
+                        // add empty blocks
+                        result.addAll(Arrays.asList(new Block[GRID_WIDTH - j - result.size()]));
+
+                        updateBlockVelocities(row, false);
+
+                        row.clear();
+                        startOfChain = j;
+                    }
+                }
+
+                Collections.reverse(result);
+
+                // put in grid
+                for (int j = 0; j < GRID_HEIGHT; j++) {
+                    grid[i][j] = result.get(j);
+                }
+            }
         }
-        // else if (keyPresssed(Keyboard.KEY_RIGHT)) {
-        // for (int i = 0; i < GRID_HEIGHT; i++) {
-        // ArrayList<Block> row = new ArrayList<Block>();
-        // ArrayList<Block> result = new ArrayList<Block>();
-
-        // for (int j = GRID_WIDTH - 1; j >= 0; j--) {
-        // row.add(grid[i][j]);
-
-        // if (leftWalls.contains(new Coordinate(i, j)) || j == 0) {
-        // ArrayList<Block> toAdd = mergeLine(row);
-        // result.addAll(toAdd);
-        // // add empty blocks
-        // result.addAll(Arrays.asList(new Block[GRID_WIDTH - j - result.size()]));
-        // row.clear();
-        // }
-        // }
-
-        // Collections.reverse(result);
-
-        // // put in grid
-        // for (int j = 0; j < GRID_HEIGHT; j++) {
-        // grid[i][j] = result.get(j);
-        // }
-        // }
-
-        // spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-        // renderGrid();
-        // swapActivePlayer();
-
-        // }
     }
 
     private void updateBlockVelocities(ArrayList<Block> line, boolean isVertical) {
@@ -423,7 +422,7 @@ public class GameWorld extends World {
             int target = -1;
             if (!isBackwards)
                 target = positionShifts.get(b) + offsetIndex;
-            else if (isBackwards && isVertical) {
+            else if (isBackwards) {
                 target = offsetIndex - positionShifts.get(b) - 1;
             }
 
@@ -495,6 +494,21 @@ public class GameWorld extends World {
      */
     private boolean keyPresssed(int key) {
         return Mayflower.isKeyDown(key) && !Mayflower.wasKeyDown(key);
+    }
+
+    private void printGrid() {
+        for (int i = 0; i < GRID_HEIGHT; i++) {
+            for (int j = 0; j < GRID_WIDTH; j++) {
+                Block b = grid[i][j];
+                if (b == null)
+                    System.out.print("-");
+                else
+                    System.out.print(b.getValue());
+                System.out.print("\t");
+            }
+            System.out.println();
+        }
+        System.out.println("-----------------------------------");
     }
 
 }

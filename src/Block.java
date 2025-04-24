@@ -42,7 +42,8 @@ public class Block extends Actor {
         // if past target destination, snap to target destination and stop
         if ((vy < 0 && getY() <= GameWorld.convertToPixels(this.targetDestination)[1])
                 || (vy > 0 && getY() >= GameWorld.convertToPixels(this.targetDestination)[1])
-                || (vx < 0 && getX() <= GameWorld.convertToPixels(this.targetDestination)[0])) {
+                || (vx < 0 && getX() <= GameWorld.convertToPixels(this.targetDestination)[0])
+                || (vx > 0 && getX() >= GameWorld.convertToPixels(this.targetDestination)[0])) {
             vx = 0;
             vy = 0;
             ax = 0;
