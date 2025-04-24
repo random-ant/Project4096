@@ -39,15 +39,19 @@ public class Block extends Actor {
         vy += ay;
         setLocation(getX() + vx, getY() + vy);
 
-        if ((vy < 0 && getY() <= GameWorld.convertToPixels(this.targetDestination)[1])) {
+        // if past target destination, snap to target destination and stop
+        if ((vy < 0 && getY() <= GameWorld.convertToPixels(this.targetDestination)[1])
+                || (vy > 0 && getY() >= GameWorld.convertToPixels(this.targetDestination)[1])
+                || (vx < 0 && getX() <= GameWorld.convertToPixels(this.targetDestination)[0])) {
+            vx = 0;
             vy = 0;
+            ax = 0;
             ay = 0;
             double[] blockPixel = GameWorld.calculateBlockPixel(this.targetDestination);
             setLocation(blockPixel[0], blockPixel[1]);
 
             GameWorld w = (GameWorld) getWorld();
             w.removeMovingBlock(this);
-            w.removeObject(this);
         }
     }
 
@@ -81,6 +85,15 @@ public class Block extends Actor {
 
     public void setAy(double ay) {
         this.ay = ay;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + value;
+        result = prime * result + ((targetDestination == null) ? 0 : targetDestination.hashCode());
+        return result;
     }
 
 }

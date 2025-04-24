@@ -34,6 +34,11 @@ public class GameWorld extends World {
     private int BLUE_SCORE = 0;
 
     /**
+     * The number of randomly spawned blocks spawned every move.
+     */
+    private int BLOCKS_SPAWNED_PER_MOVE = 3;
+
+    /**
      * Which players turn it is.
      * 
      * If FALSE, then it is BLUE's turn. If TRUE, then it
@@ -41,6 +46,7 @@ public class GameWorld extends World {
      */
     public static boolean turn;
 
+    private ArrayList<Block> mergingStillBlocks = new ArrayList<Block>();
     private Set<Block> currentlyMovingBlocks = new HashSet<Block>();
 
     public GameWorld() {
@@ -49,21 +55,21 @@ public class GameWorld extends World {
         leftWalls = new HashSet<Coordinate>();
         turn = true; // blue goes first
 
-        addWalls();
-        // addObject(new Title(), 20, 20);
         addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
         turnGraph = new TurnGraphic(turn);
         addObject(turnGraph, 40, 55);
 
         // grid[0][0] = new Block(16, BColor.BLUE);
-        grid[1][0] = new Block(2, BColor.BLUE);
-        grid[2][0] = new Block(2, BColor.BLUE);
-        grid[3][0] = new Block(4, BColor.BLUE);
-        grid[4][0] = new Block(2, BColor.BLUE);
-        grid[5][0] = new Block(2, BColor.BLUE);
+        grid[0][4] = new Block(2, BColor.BLUE);
+        grid[1][4] = new Block(2, BColor.BLUE);
+        grid[9][4] = new Block(4, BColor.BLUE);
+        grid[9][3] = new Block(4, BColor.RED);
+        // grid[0][4] = new Block(2, BColor.BLUE);
+        // grid[0][5] = new Block(2, BColor.BLUE);
 
-        spawnRandomBlocks(10);
+        // spawnRandomBlocks(10);
+        addWalls();
         renderBaseGrid();
         renderGrid();
     }
@@ -162,15 +168,27 @@ public class GameWorld extends World {
 
     public void removeMovingBlock(Block b) {
         currentlyMovingBlocks.remove(b);
-        System.out.println(currentlyMovingBlocks.size());
+        removeObject(b);
+        // System.out.println(currentlyMovingBlocks.size() + " left");
+
+        // triggers once when all animations have been completed
         if (currentlyMovingBlocks.isEmpty()) {
+            // remove all still blocks that need to be merged
+            for (Block still : mergingStillBlocks)
+                removeObject(still);
+            mergingStillBlocks.clear();
+
+            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
+            swapActivePlayer();
             renderGrid();
         }
     }
 
     @Override
     public void act() {
-        int BLOCKS_SPAWNED_PER_MOVE = 3;
+        // if in the middle of an animation, disregard key presses
+        if (!currentlyMovingBlocks.isEmpty())
+            return;
 
         // listen for key presses and act accordingly
         if (keyPresssed(Keyboard.KEY_UP)) {
@@ -182,7 +200,7 @@ public class GameWorld extends World {
                 for (int i = 0; i <= GRID_HEIGHT; i++) {
                     // when there's a wall, merge what we already have
                     if (topWalls.contains(new Coordinate(i, j)) || i == GRID_HEIGHT) {
-                        ArrayList<Block> toAdd = mergeLine(col, true, j, startOfChain);
+                        ArrayList<Block> toAdd = mergeLine(col, j, startOfChain, true, false);
                         result.addAll(toAdd);
 
                         // add empty blocks
@@ -206,20 +224,17 @@ public class GameWorld extends World {
                 }
             }
 
-            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-            swapActivePlayer();
-
         } else if (keyPresssed(Keyboard.KEY_DOWN)) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 ArrayList<Block> col = new ArrayList<Block>();
                 ArrayList<Block> result = new ArrayList<Block>();
-                int startOfChain = 1;
+                int startOfChain = GRID_HEIGHT;
 
                 for (int i = GRID_HEIGHT - 1; i >= 0; i--) {
                     col.add(grid[i][j]);
 
                     if (topWalls.contains(new Coordinate(i, j)) || i == 0) {
-                        ArrayList<Block> toAdd = mergeLine(col, true, j, -9);
+                        ArrayList<Block> toAdd = mergeLine(col, j, startOfChain, true, true);
                         // add empty blocks
                         result.addAll(toAdd);
                         result.addAll(Arrays.asList(new Block[GRID_HEIGHT - i - result.size()]));
@@ -227,7 +242,7 @@ public class GameWorld extends World {
                         updateBlockVelocities(col, true);
 
                         col.clear();
-                        startOfChain = i + 1;
+                        startOfChain = i;
                     }
                 }
 
@@ -239,41 +254,38 @@ public class GameWorld extends World {
                 }
             }
 
-            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-            renderGrid();
-            swapActivePlayer();
+        } else if (keyPresssed(Keyboard.KEY_LEFT)) {
+            for (int i = 0; i < GRID_HEIGHT; i++) {
+                ArrayList<Block> row = new ArrayList<Block>();
+                ArrayList<Block> result = new ArrayList<Block>();
+                int startOfChain = 0;
+
+                for (int j = 0; j <= GRID_WIDTH; j++) {
+                    if (leftWalls.contains(new Coordinate(i, j)) || j == GRID_WIDTH) {
+                        ArrayList<Block> toAdd = mergeLine(row, i, startOfChain, false, false);
+                        result.addAll(toAdd);
+                        // add empty blocks
+                        result.addAll(Arrays.asList(new Block[j - result.size()]));
+
+                        updateBlockVelocities(row, false);
+
+                        row.clear();
+                        startOfChain = j;
+                    }
+
+                    if (j < GRID_WIDTH) {
+                        row.add(grid[i][j]);
+                    }
+                }
+
+                // put in grid
+                for (int j = 0; j < GRID_WIDTH; j++) {
+                    grid[i][j] = result.get(j);
+                }
+            }
 
         }
-        // else if (keyPresssed(Keyboard.KEY_LEFT)) {
-        // for (int i = 0; i < GRID_HEIGHT; i++) {
-        // ArrayList<Block> row = new ArrayList<Block>();
-        // ArrayList<Block> result = new ArrayList<Block>();
-
-        // for (int j = 0; j <= GRID_WIDTH; j++) {
-        // if (leftWalls.contains(new Coordinate(i, j)) || j == GRID_WIDTH) {
-        // ArrayList<Block> toAdd = mergeLine(row);
-        // result.addAll(toAdd);
-        // // add empty blocks
-        // result.addAll(Arrays.asList(new Block[j - result.size()]));
-        // row.clear();
-        // }
-
-        // if (j < GRID_WIDTH) {
-        // row.add(grid[i][j]);
-        // }
-        // }
-
-        // // put in grid
-        // for (int j = 0; j < GRID_HEIGHT; j++) {
-        // grid[i][j] = result.get(j);
-        // }
-        // }
-
-        // spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-        // renderGrid();
-        // swapActivePlayer();
-
-        // } else if (keyPresssed(Keyboard.KEY_RIGHT)) {
+        // else if (keyPresssed(Keyboard.KEY_RIGHT)) {
         // for (int i = 0; i < GRID_HEIGHT; i++) {
         // ArrayList<Block> row = new ArrayList<Block>();
         // ArrayList<Block> result = new ArrayList<Block>();
@@ -307,6 +319,8 @@ public class GameWorld extends World {
 
     private void updateBlockVelocities(ArrayList<Block> line, boolean isVertical) {
         double ANIMATION_TIME = 8.5;
+        double initialVelocity = 0;
+        // ANIMATION_TIME = 200;
 
         // update velocities of blocks
         for (Block b : line) {
@@ -317,18 +331,30 @@ public class GameWorld extends World {
             if (isVertical) {
                 double initialPos = b.getY();
                 double finalPos = convertToPixels(b.getTargetDestination())[1] + BLOCK_BORDER_HEIGHT;
-                double acceleration = 2 * (finalPos - initialPos) / (ANIMATION_TIME * ANIMATION_TIME);
+                double acceleration = 2 * (finalPos - initialPos - initialVelocity * ANIMATION_TIME)
+                        / (ANIMATION_TIME * ANIMATION_TIME);
 
                 b.setAy(acceleration);
+
+                // System.out.println(
+                // "initialPos: " + initialPos + ", finalPos: (" +
+                // b.getTargetDestination().getCol() + ","
+                // + b.getTargetDestination().getRow() + ") acceleration: " + acceleration);
             } else {
                 double initialPos = b.getX();
                 double finalPos = convertToPixels(b.getTargetDestination())[0] + BLOCK_BORDER_WIDTH;
                 double acceleration = 2 * (finalPos - initialPos) / (ANIMATION_TIME * ANIMATION_TIME);
 
                 b.setAx(acceleration);
+
+                // System.out.println(
+                // "initialPos: " + initialPos + ", finalPos: (" +
+                // b.getTargetDestination().getCol() + ","
+                // + b.getTargetDestination().getRow() + ") acceleration: " + acceleration);
             }
 
             currentlyMovingBlocks.add(b);
+
         }
     }
 
@@ -347,10 +373,11 @@ public class GameWorld extends World {
      * @return An {@code ArrayList} of merged blocks. All empty blocks will have
      *         been removed.
      */
-    public ArrayList<Block> mergeLine(ArrayList<Block> blocks, boolean isVertical, int lineIndex, int offsetIndex) {
+    public ArrayList<Block> mergeLine(ArrayList<Block> blocks, int lineIndex, int offsetIndex, boolean isVertical,
+            boolean isBackwards) {
         Stack<Block> stack = new Stack<Block>();
         // index in row -> new index in row
-        Map<Integer, Integer> positionShifts = new HashMap<Integer, Integer>();
+        Map<Block, Integer> positionShifts = new HashMap<Block, Integer>();
 
         for (int i = 0; i < blocks.size(); i++) {
             Block currentBlock = blocks.get(i);
@@ -361,6 +388,7 @@ public class GameWorld extends World {
 
             while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
                 Block top = stack.pop();
+                positionShifts.put(top, Math.max(stack.size() - 1, 0));
                 int newValue = top.getValue() * 2;
                 BColor newColor;
 
@@ -376,8 +404,7 @@ public class GameWorld extends World {
                 currentBlock = newBlock;
             }
             stack.add(currentBlock);
-
-            positionShifts.put(i, stack.size() - 1);
+            positionShifts.put(blocks.get(i), stack.size() - 1);
         }
 
         ArrayList<Block> result = new ArrayList<Block>();
@@ -387,19 +414,33 @@ public class GameWorld extends World {
 
         Collections.reverse(result);
 
-        // update coordinates of blocks
+        // update destination coordinates for block animations
         for (int i = 0; i < blocks.size(); i++) {
             if (blocks.get(i) == null)
                 continue;
 
             Block b = blocks.get(i);
-            int target = positionShifts.get(i) + offsetIndex;
-            target = Math.abs(target);
-            if (target == i + offsetIndex) // if the block is already in the right place
+            int target = -1;
+            if (!isBackwards)
+                target = positionShifts.get(b) + offsetIndex;
+            else if (isBackwards && isVertical) {
+                target = offsetIndex - positionShifts.get(b) - 1;
+            }
+
+            // if the block is already in the right place
+            if ((!isBackwards && target == i + offsetIndex) || (isBackwards && target == offsetIndex - i - 1)) {
                 b.setTargetDestination(null);
-            else if (isVertical) {
+
+                // only delete the object if it is going to be merged into something
+                if (blocks.get(i).getValue() != result.get(i).getValue()) {
+                    // removeObject(b);
+                    mergingStillBlocks.add(b);
+                }
+
+                continue;
+            } else if (isVertical) {
                 b.setTargetDestination(new Coordinate(target, lineIndex));
-            } else {
+            } else if (!isVertical) {
                 b.setTargetDestination(new Coordinate(lineIndex, target));
             }
         }
@@ -440,7 +481,7 @@ public class GameWorld extends World {
         Collections.shuffle(empty);
         for (int i = 0; i < numBlocks && i < empty.size(); i++) {
             Coordinate g = empty.get(i);
-            // grid[g.getRow()][g.getCol()] = new Block(value, BColor.NEUTRAL);
+            grid[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE);
         }
     }
 
