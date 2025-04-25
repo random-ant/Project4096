@@ -38,7 +38,7 @@ public class GameServer extends Server {
 		// check if client is in a game and if that game is not over
 		if (game != null || "ready".equals(parts[0])) {
 			// check if it is this players turn
-			
+
 			// if (curr == player) {
 			// parse the row and col from the message
 			try {
@@ -64,21 +64,16 @@ public class GameServer extends Server {
 						send(id, "error location is occupied: [" + message + "]");
 					}
 				} else if ("move".equals(parts[0])) {
+
 					String dir = parts[1];
-					switch (dir) {
-						case "UP":
-							System.out.println("RECEVIEWD UP");
-							game.merge(Direction.UP);
-							break;
-						case "DOWN":
-							game.merge(Direction.DOWN);
-							break;
-						case "LEFT":
-							game.merge(Direction.LEFT);
-							break;
-						case "RIGHT":
-							game.merge(Direction.RIGHT);
-							break;
+					if ("UP".equals(dir)) {
+						game.merge(Direction.UP);
+					} else if ("DOWN".equals(dir)) {
+						game.merge(Direction.DOWN);
+					} else if ("LEFT".equals(dir)) {
+						game.merge(Direction.LEFT);
+					} else if ("RIGHT".equals(dir)) {
+						game.merge(Direction.RIGHT);
 					}
 
 					// response
@@ -158,14 +153,14 @@ public class GameServer extends Server {
 				send(clientA, "youare RED");
 			}
 
-			int INITIAL_BLOCKS = 2;
-			for (int i = 0; i < INITIAL_BLOCKS; i++) {
-				int[] block = game.spawnRandomBlock();
-				game.addBlock(block[0], block[1], block[2], BColor.NEUTRAL);
-				String message = "addblock " + block[0] + " " + block[1] + " " + block[2];
-				send(clientA, message);
-				send(clientB, message);
-			}
+			// int INITIAL_BLOCKS = 2;
+			// for (int i = 0; i < INITIAL_BLOCKS; i++) {
+			// int[] block = game.spawnRandomBlock();
+			// game.addBlock(block[0], block[1], block[2], BColor.NEUTRAL);
+			// String message = "addblock " + block[0] + " " + block[1] + " " + block[2];
+			// send(clientA, message);
+			// send(clientB, message);
+			// }
 			send(clientA, "render");
 			send(clientB, "render");
 

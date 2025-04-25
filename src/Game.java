@@ -39,6 +39,8 @@ public class Game {
             this.currentPlayer = BColor.BLUE;
         }
 
+        System.out.println("NEW PLAYER: " + currentPlayer.toString());
+
         return this.currentPlayer;
     }
 
@@ -311,23 +313,12 @@ public class Game {
         return result;
     }
 
-    public Game copy() {
-        Game copy = new Game();
-        for (int r = 0; r < this.grid.length; r++) {
-            for (int c = 0; c < this.grid[r].length; c++) {
-                copy.setBlock(r, c, this.grid[r][c]);
-            }
-        }
-        copy.setCurrentPlayer(this.currentPlayer);
-        return copy;
-    }
-
     public BColor getMyColor() {
         return myColor;
     }
 
     public void setMyColor(BColor color) {
-        myColor = color;
+        this.myColor = color;
     }
 
     public BColor getCurrentPlayer() {
@@ -390,6 +381,7 @@ public class Game {
     public void merge(Direction dir) {
         if (dir == Direction.UP) {
             shiftBlocksUp();
+
         } else if (dir == Direction.DOWN) {
             shiftBlocksDown();
         } else if (dir == Direction.LEFT) {

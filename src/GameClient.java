@@ -24,6 +24,19 @@ public class GameClient extends Client {
         // in.close();
     }
 
+    public GameClient(String ip) {
+
+        // System.out.print("Port > ");
+        // int port = in.nextInt();
+        int port = 1234; // default server port
+
+        // System.out.println("Connecting...");
+        connect(ip, port);
+        // connect("localhost", port);
+
+        // in.close();
+    }
+
     public void process(String message) {
         // "youare RED/BLUE"
         // "move UP/DOWN/LEFT/RIGHT"
@@ -61,9 +74,13 @@ public class GameClient extends Client {
             } else if ("RIGHT".equals(dir)) {
                 game.merge(Direction.RIGHT);
             }
-            // game.nextPlayer();
-            // world.getTurnGraph().setTurn(game.getMyColor());
-            // world.renderGrid();
+
+            game.swapActivePlayer();
+            if (game.isTurn()) {
+                world.getTurnGraphic().setTurn(game.getMyColor());
+            } else {
+                world.getTurnGraphic().setTurn(BColor.NEUTRAL);
+            }
         } else if ("addblock".equals(parts[0])) {
             int row = Integer.parseInt(parts[1]);
             int col = Integer.parseInt(parts[2]);

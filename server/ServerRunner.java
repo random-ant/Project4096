@@ -1,5 +1,3 @@
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import mayflower.net.Server;
 import mayflower.net.ServerGUI;
 

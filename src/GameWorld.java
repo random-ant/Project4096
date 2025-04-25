@@ -6,7 +6,6 @@ import java.util.*;
  */
 public class GameWorld extends World {
     private Game game;
-    private Block[][] grid;
     private GameClient client;
 
     /**
@@ -35,16 +34,7 @@ public class GameWorld extends World {
      */
     private int BLOCKS_SPAWNED_PER_MOVE = 3;
 
-    /**
-     * Which players turn it is.
-     * 
-     * If FALSE, then it is BLUE's turn. If TRUE, then it
-     * is RED's turn.
-     */
-    public static boolean turn;
-
     public GameWorld(GameClient client, Game game) {
-        grid = new Block[GRID_HEIGHT][GRID_WIDTH];
         this.client = client;
         this.game = game;
 
@@ -57,6 +47,9 @@ public class GameWorld extends World {
             turnGraphic = new TurnGraphic(BColor.NEUTRAL);
 
         addObject(turnGraphic, 40, 55);
+
+        game.addBlock(1, 0, 2);
+        game.addBlock(2, 0, 2);
 
         spawnRandomBlocks(10);
         addWalls();
@@ -118,7 +111,7 @@ public class GameWorld extends World {
                 int x_coord = converted.getX(), y_coord = converted.getY();
 
                 // add blocks
-                Block currBlock = grid[i][j];
+                Block currBlock = game.getGrid()[i][j];
                 if (currBlock != null) {
                     addObject(currBlock, x_coord + BLOCK_BORDER_WIDTH, y_coord + BLOCK_BORDER_HEIGHT);
                 }
@@ -171,8 +164,7 @@ public class GameWorld extends World {
             mergingStillBlocks.clear();
 
             spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-            BColor nextPlayer = game.swapActivePlayer();
-            turnGraphic.setTurn(nextPlayer);
+
             // printGrid();
             renderGrid();
 
@@ -197,35 +189,47 @@ public class GameWorld extends World {
         if (keyPressed(Keyboard.KEY_UP)) {
             game.merge(Direction.UP);
             client.send("move " + Direction.UP);
+            game.swapActivePlayer();
+            if (game.isTurn()) {
+                turnGraphic.setTurn(game.getMyColor());
+            } else {
+                turnGraphic.setTurn(BColor.NEUTRAL);
+            }
         } else if (keyPressed(Keyboard.KEY_DOWN)) {
             game.merge(Direction.DOWN);
             client.send("move " + Direction.DOWN);
+            game.swapActivePlayer();
+            if (game.isTurn()) {
+                turnGraphic.setTurn(game.getMyColor());
+            } else {
+                turnGraphic.setTurn(BColor.NEUTRAL);
+            }
         } else if (keyPressed(Keyboard.KEY_LEFT)) {
             game.merge(Direction.LEFT);
             client.send("move " + Direction.LEFT);
+            game.swapActivePlayer();
+            if (game.isTurn()) {
+                turnGraphic.setTurn(game.getMyColor());
+            } else {
+                turnGraphic.setTurn(BColor.NEUTRAL);
+            }
         } else if (keyPressed(Keyboard.KEY_RIGHT)) {
             game.merge(Direction.RIGHT);
             client.send("move " + Direction.RIGHT);
+            game.swapActivePlayer();
+            if (game.isTurn()) {
+                turnGraphic.setTurn(game.getMyColor());
+            } else {
+                turnGraphic.setTurn(BColor.NEUTRAL);
+            }
         }
-    }
-
-    public void spawnRandomBlocksAndSend(int numBlocks) {
-        // wtf is going on here
-        int[][] add = new int[numBlocks][3];
-        for (int block = 0; block < numBlocks; block++) {
-            add[block] = game.spawnRandomBlock();
-            String message = "addblock " + add[block][0] + " " + add[block][1] + " " + add[block][2];
-            client.send(message);
-        }
-        // renderGrid();
-        // client.send("render");
     }
 
     private ArrayList<Coordinate> getEmptyTiles() {
         ArrayList<Coordinate> out = new ArrayList<Coordinate>(GRID_HEIGHT * GRID_WIDTH);
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
-                if (grid[i][j] == null) {
+                if (game.getGrid()[i][j] == null) {
                     out.add(new Coordinate(i, j));
                 }
             }
@@ -251,10 +255,10 @@ public class GameWorld extends World {
             value = 8;
 
         ArrayList<Coordinate> empty = getEmptyTiles();
-        Collections.shuffle(empty);
+        Collections.shuffle(empty, new Random(324392837));
         for (int i = 0; i < numBlocks && i < empty.size(); i++) {
             Coordinate g = empty.get(i);
-            grid[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE);
+            game.getGrid()[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE);
         }
     }
 
@@ -268,6 +272,10 @@ public class GameWorld extends World {
      */
     private boolean keyPressed(int key) {
         return Mayflower.isKeyDown(key) && !Mayflower.wasKeyDown(key);
+    }
+
+    public TurnGraphic getTurnGraphic() {
+        return turnGraphic;
     }
 
 }
