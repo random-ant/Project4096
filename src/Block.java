@@ -1,14 +1,18 @@
-import mayflower.Actor;
-import mayflower.MayflowerImage;
+import mayflower.*;
 
 public class Block extends Actor {
 
     private int value;
     private BColor color;
+    private Coordinate targetDestination;
+    private double vx, vy;
+    private double ax, ay;
 
     public Block(int value, BColor color) {
         this.value = value;
         this.color = color;
+        this.targetDestination = null;
+        vx = vy = ax = ay = 0;
 
         if (color == BColor.NEUTRAL) {
             MayflowerImage img = new MayflowerImage("src/img/blocks/neutral/neutral-block" + value + ".png");
@@ -30,6 +34,34 @@ public class Block extends Actor {
     }
 
     public void act() {
+        // Update the block's position based on its velocity and acceleration
+        vx += ax;
+        vy += ay;
+        setLocation(getX() + vx, getY() + vy);
+
+        // if past target destination, snap to target destination and stop
+        if ((vy < 0 && getY() <= GameWorld.convertToPixels(this.targetDestination).getY())
+                || (vy > 0 && getY() >= GameWorld.convertToPixels(this.targetDestination).getY())
+                || (vx < 0 && getX() <= GameWorld.convertToPixels(this.targetDestination).getX())
+                || (vx > 0 && getX() >= GameWorld.convertToPixels(this.targetDestination).getX())) {
+            vx = 0;
+            vy = 0;
+            ax = 0;
+            ay = 0;
+            Coordinate blockPixel = GameWorld.calculateBlockPixel(this.targetDestination);
+            setLocation(blockPixel.getX(), blockPixel.getY());
+
+            GameWorld w = (GameWorld) getWorld();
+            w.removeMovingBlock(this);
+        }
+    }
+
+    public Coordinate getTargetDestination() {
+        return targetDestination;
+    }
+
+    public void setTargetDestination(Coordinate targetDestination) {
+        this.targetDestination = targetDestination;
     }
 
     public int getValue() {
@@ -47,4 +79,22 @@ public class Block extends Actor {
     public void setColor(BColor color) {
         this.color = color;
     }
+
+    public void setAx(double ax) {
+        this.ax = ax;
+    }
+
+    public void setAy(double ay) {
+        this.ay = ay;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + value;
+        result = prime * result + ((targetDestination == null) ? 0 : targetDestination.hashCode());
+        return result;
+    }
+
 }

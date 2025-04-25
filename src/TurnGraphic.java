@@ -1,6 +1,7 @@
 import mayflower.*;
 
 public class TurnGraphic extends Actor {
+    BColor turn;
     private MayflowerImage turnBlueImg, turnRedImg, turnNeutralImg;
 
     public TurnGraphic(BColor color) {
@@ -11,13 +12,8 @@ public class TurnGraphic extends Actor {
         turnRedImg.scale(201, 144);
         turnNeutralImg.scale(201, 144);
 
-        if (color == BColor.BLUE) {
-            setImage(turnBlueImg);
-        } else if (color == BColor.RED) {
-            setImage(turnRedImg);
-        } else {
-            setImage(turnNeutralImg);
-        }
+        this.turn = color;
+        updateGraphic();
     }
 
     /**
@@ -27,18 +23,15 @@ public class TurnGraphic extends Actor {
      * @return void
      */
     public void setTurn(BColor color) {
-        if (color == BColor.BLUE) {
-            setImage(turnBlueImg);
-        } else if (color == BColor.RED) {
-            setImage(turnRedImg);
-        } else {
-            setImage(turnNeutralImg);
-        }
+        this.turn = color;
+        updateGraphic();
     }
 
-    public void setTurn(BColor color, boolean isTurn) {
-        if (isTurn) {
+    private void updateGraphic() {
+        if (turn == BColor.BLUE) {
             setImage(turnBlueImg);
+        } else if (turn == BColor.RED) {
+            setImage(turnRedImg);
         } else {
             setImage(turnNeutralImg);
         }

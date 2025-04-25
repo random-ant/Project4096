@@ -48,9 +48,17 @@ public class Coordinate {
         this.col = col;
     }
 
+    public int getX() {
+        return getCol();
+    }
+
+    public int getY() {
+        return getRow();
+    }
+
     @Override
     public String toString() {
-        return "(" + row + ", " + col + ")";
+        return "(" + col + ", " + row + ")";
     }
 
 }

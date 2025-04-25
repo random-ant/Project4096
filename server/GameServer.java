@@ -1,11 +1,5 @@
 import mayflower.net.*;
-import java.util.Map;
-import java.util.Set;
-import java.util.List;
-import java.util.Queue;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
 
 public class GameServer extends Server {
 	private Queue<Integer> clientsWaitingForGame;
@@ -42,75 +36,67 @@ public class GameServer extends Server {
 
 		String[] parts = message.trim().split(" ");
 		// check if client is in a game and if that game is not over
-		if (game != null) {
+		if (game != null || "ready".equals(parts[0])) {
 			// check if it is this players turn
-			BColor player = blueClients.contains(id) ? BColor.BLUE : BColor.RED;
-			BColor curr = game.getCurrentPlayer();
+
 			// if (curr == player) {
 			// parse the row and col from the message
-			if ("addblock".equals(parts[0]) || "move".equals(parts[0]) || "render".equals(parts[0])) {
-				try {
-					// Integer.parseInt() can throw an exception
-					if ("addblock".equals(parts[0])) {
-						int row = Integer.parseInt(parts[1]);
-						int col = Integer.parseInt(parts[2]);
-						int val = Integer.parseInt(parts[3]);
+			try {
+				// Integer.parseInt() can throw an exception
+				if ("addblock".equals(parts[0])) {
+					int row = Integer.parseInt(parts[1]);
+					int col = Integer.parseInt(parts[2]);
+					int val = Integer.parseInt(parts[3]);
 
-						// check if a piece can be placed at (row, col)
-						if (null == game.getBlock(row, col)) {
+					// check if a piece can be placed at (row, col)
+					if (null == game.getBlock(row, col)) {
 
-							// FIX FIX
+						// FIX FIX
 
-							game.addBlock(row, col, val, BColor.NEUTRAL);
+						game.addBlock(row, col, val, BColor.NEUTRAL);
 
-							// broadcast this move to both clients in this game
-							String response = "addblock " + row + " " + col + " " + val;
-							// send(id, response);
-							send(otherPlayer.get(id), response);
-
-						} else {
-							send(id, "error location is occupied: [" + message + "]");
-						}
-					}
-					if ("move".equals(parts[0])) {
-						String dir = parts[1];
-						if ("UP".equals(dir)) {
-							game.merge(Direction.UP);
-						} else if ("DOWN".equals(dir)) {
-							game.merge(Direction.DOWN);
-						} else if ("LEFT".equals(dir)) {
-							game.merge(Direction.LEFT);
-						} else if ("RIGHT".equals(dir)) {
-							game.merge(Direction.RIGHT);
-						}
-						game.nextPlayer();
-
-						// response
-						String response = "move " + dir;
+						// broadcast this move to both clients in this game
+						String response = "addblock " + row + " " + col + " " + val;
 						// send(id, response);
 						send(otherPlayer.get(id), response);
+
+					} else {
+						send(id, "error location is occupied: [" + message + "]");
 					}
-					if ("render".equals(parts[0])) {
-						send(otherPlayer.get(id), "render");
+				} else if ("move".equals(parts[0])) {
+
+					String dir = parts[1];
+					if ("UP".equals(dir)) {
+						game.merge(Direction.UP);
+					} else if ("DOWN".equals(dir)) {
+						game.merge(Direction.DOWN);
+					} else if ("LEFT".equals(dir)) {
+						game.merge(Direction.LEFT);
+					} else if ("RIGHT".equals(dir)) {
+						game.merge(Direction.RIGHT);
 					}
-				} catch (Exception e) {
-					send(id, "error invalid request: [" + message + "]");
-					e.printStackTrace();
+
+					// response
+					String response = "move " + dir;
+					// send(id, response);
+					send(otherPlayer.get(id), response);
+				} else if ("render".equals(parts[0])) {
+					send(otherPlayer.get(id), "render");
+				} else if ("ready".equals(parts[0])) {
+					System.out.println("" + id + " ready");
+					if (!clientsWaitingForGame.contains(id))
+						clientsWaitingForGame.add(id);
+					startNew();
+				} else {
+					send(id, "error game not found");
 				}
-			} else {
+			} catch (Exception e) {
 				send(id, "error invalid request: [" + message + "]");
-				System.out.println(parts);
+				e.printStackTrace();
 			}
-			// } else {
-			// send(id, "error not your turn");
-			// }
-		} else if (parts[0].equals("ready")) {
-			System.out.println("" + id + " ready");
-			if (!clientsWaitingForGame.contains(id))
-				clientsWaitingForGame.add(id);
-			startNew();
 		} else {
-			send(id, "error game not found");
+			send(id, "error, game doesn't exist??");
+			System.out.println(parts);
 		}
 	}
 
@@ -132,6 +118,7 @@ public class GameServer extends Server {
 		System.out.println("start new");
 		// If there are at least 2 clients waiting for a game...
 		if (clientsWaitingForGame.size() >= 2) {
+			System.out.println("two ready");
 			// get the two clients that have been waiting the longest
 			Integer clientA = clientsWaitingForGame.remove();
 			Integer clientB = clientsWaitingForGame.remove();
@@ -166,14 +153,14 @@ public class GameServer extends Server {
 				send(clientA, "youare RED");
 			}
 
-			int INITIAL_BLOCKS = 2;
-			for (int i = 0; i < INITIAL_BLOCKS; i++) {
-				int[] block = game.spawnRandomBlock();
-				game.addBlock(block[0], block[1], block[2], BColor.NEUTRAL);
-				String message = "addblock " + block[0] + " " + block[1] + " " + block[2];
-				send(clientA, message);
-				send(clientB, message);
-			}
+			// int INITIAL_BLOCKS = 2;
+			// for (int i = 0; i < INITIAL_BLOCKS; i++) {
+			// int[] block = game.spawnRandomBlock();
+			// game.addBlock(block[0], block[1], block[2], BColor.NEUTRAL);
+			// String message = "addblock " + block[0] + " " + block[1] + " " + block[2];
+			// send(clientA, message);
+			// send(clientB, message);
+			// }
 			send(clientA, "render");
 			send(clientB, "render");
 

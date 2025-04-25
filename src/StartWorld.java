@@ -20,10 +20,10 @@ public class StartWorld extends World {
         GameWorld world = new GameWorld(client, game);
 
         BColor player = game.getMyColor();
-        if (player == BColor.BLUE)
-            world.getTurnGraph().setTurn(BColor.BLUE);
-        else
-            world.getTurnGraph().setTurn(BColor.NEUTRAL);
+        // if (player == BColor.BLUE)
+        // world.getTurnGraph().setTurn(BColor.BLUE);
+        // else
+        // world.getTurnGraph().setTurn(BColor.NEUTRAL);
 
         Mayflower.setWorld(world);
         return world;
