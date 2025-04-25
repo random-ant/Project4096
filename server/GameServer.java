@@ -36,10 +36,9 @@ public class GameServer extends Server {
 
 		String[] parts = message.trim().split(" ");
 		// check if client is in a game and if that game is not over
-		if (game != null) {
+		if (game != null || "ready".equals(parts[0])) {
 			// check if it is this players turn
-			BColor player = blueClients.contains(id) ? BColor.BLUE : BColor.RED;
-			BColor curr = game.getCurrentPlayer();
+			
 			// if (curr == player) {
 			// parse the row and col from the message
 			try {
@@ -124,6 +123,7 @@ public class GameServer extends Server {
 		System.out.println("start new");
 		// If there are at least 2 clients waiting for a game...
 		if (clientsWaitingForGame.size() >= 2) {
+			System.out.println("two ready");
 			// get the two clients that have been waiting the longest
 			Integer clientA = clientsWaitingForGame.remove();
 			Integer clientB = clientsWaitingForGame.remove();
