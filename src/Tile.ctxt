@@ -1,0 +1,10 @@
+#BlueJ class context
+comment0.target=Tile
+comment0.text=\r\n\ Represents\ a\ tile\ in\ the\ game\ grid.\r\n\ This\ class\ is\ responsible\ for\ displaying\ a\ single\ tile\ using\ an\ image.\r\n
+comment1.params=
+comment1.target=Tile()
+comment1.text=\r\n\ Constructs\ a\ Tile\ and\ sets\ its\ image.\r\n\ The\ image\ is\ scaled\ to\ match\ the\ dimensions\ of\ a\ tile\ in\ the\ game\ grid.\r\n
+comment2.params=
+comment2.target=void\ act()
+comment2.text=\r\n\ Defines\ the\ behavior\ of\ the\ Tile.\r\n\ Currently,\ this\ method\ does\ not\ perform\ any\ actions.\r\n
+numComments=3

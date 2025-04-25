@@ -1,0 +1,16 @@
+#BlueJ class context
+comment0.target=GameClient
+comment0.text=\r\n\ Represents\ the\ client-side\ logic\ for\ connecting\ to\ and\ interacting\ with\ the\r\n\ game\ server.\r\n
+comment1.params=
+comment1.target=GameClient()
+comment1.text=\r\n\ Constructs\ a\ GameClient\ and\ connects\ to\ the\ server.\r\n
+comment2.params=message
+comment2.target=void\ process(java.lang.String)
+comment2.text=\r\n\ Processes\ a\ message\ received\ from\ the\ server.\r\n\ \r\n\ @param\ message\ The\ message\ received\ from\ the\ server.\r\n
+comment3.params=message
+comment3.target=void\ onDisconnect(java.lang.String)
+comment3.text=\r\n\ Handles\ the\ event\ when\ the\ client\ disconnects\ from\ the\ server.\r\n\ \r\n\ @param\ message\ The\ disconnect\ message.\r\n
+comment4.params=
+comment4.target=void\ onConnect()
+comment4.text=\r\n\ Handles\ the\ event\ when\ the\ client\ successfully\ connects\ to\ the\ server.\r\n
+numComments=5

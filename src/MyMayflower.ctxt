@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.target=MyMayflower
+comment1.params=title\ width\ height\ world
+comment1.target=MyMayflower(java.lang.String,\ int,\ int,\ mayflower.World)
+comment1.text=\r\n\ Constructs\ a\ MyMayflower\ instance\ with\ the\ specified\ title,\ dimensions,\ and\r\n\ world.\r\n\ \r\n\ @param\ title\ \ The\ title\ of\ the\ game\ window.\r\n\ @param\ width\ \ The\ width\ of\ the\ game\ window.\r\n\ @param\ height\ The\ height\ of\ the\ game\ window.\r\n\ @param\ world\ \ The\ initial\ world\ to\ display.\r\n
+comment2.params=
+comment2.target=void\ init()
+comment2.text=\r\n\ Initializes\ the\ game\ settings\ and\ sets\ the\ initial\ world.\r\n\ This\ method\ is\ called\ when\ the\ game\ starts.\r\n
+numComments=3

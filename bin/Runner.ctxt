@@ -1,0 +1,7 @@
+#BlueJ class context
+comment0.target=Runner
+comment0.text=\r\n\ The\ main\ entry\ point\ for\ the\ game\ client.\r\n\ This\ class\ starts\ the\ game\ by\ creating\ a\ new\ instance\ of\ the\ GameClient.\r\n
+comment1.params=args
+comment1.target=void\ main(java.lang.String[])
+comment1.text=\r\n\ The\ main\ method\ that\ starts\ the\ game\ client.\r\n\ \r\n\ @param\ args\ Command-line\ arguments\ (not\ used).\r\n
+numComments=2

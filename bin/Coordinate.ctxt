@@ -1,0 +1,22 @@
+#BlueJ class context
+comment0.target=Coordinate
+comment0.text=\r\n\ Represents\ a\ coordinate\ in\ the\ game\ grid\ with\ a\ row\ and\ column.\r\n
+comment1.params=row\ col
+comment1.target=Coordinate(int,\ int)
+comment1.text=\r\n\ Constructs\ a\ Coordinate\ with\ the\ specified\ row\ and\ column.\r\n\ \r\n\ @param\ row\ The\ row\ index.\r\n\ @param\ col\ The\ column\ index.\r\n
+comment2.params=
+comment2.target=int\ getRow()
+comment2.text=\r\n\ Retrieves\ the\ row\ index\ of\ the\ coordinate.\r\n\ \r\n\ @return\ The\ row\ index.\r\n
+comment3.params=row
+comment3.target=void\ setRow(int)
+comment3.text=\r\n\ Sets\ the\ row\ index\ of\ the\ coordinate.\r\n\ \r\n\ @param\ row\ The\ new\ row\ index.\r\n
+comment4.params=
+comment4.target=int\ getCol()
+comment4.text=\r\n\ Retrieves\ the\ column\ index\ of\ the\ coordinate.\r\n\ \r\n\ @return\ The\ column\ index.\r\n
+comment5.params=col
+comment5.target=void\ setCol(int)
+comment5.text=\r\n\ Sets\ the\ column\ index\ of\ the\ coordinate.\r\n\ \r\n\ @param\ col\ The\ new\ column\ index.\r\n
+comment6.params=
+comment6.target=java.lang.String\ toString()
+comment6.text=\r\n\ Returns\ a\ string\ representation\ of\ the\ coordinate.\r\n\ \r\n\ @return\ A\ string\ in\ the\ format\ "(row,\ col)".\r\n
+numComments=7

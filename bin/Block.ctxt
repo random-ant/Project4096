@@ -1,0 +1,22 @@
+#BlueJ class context
+comment0.target=Block
+comment0.text=\r\n\ Represents\ a\ block\ in\ the\ game\ grid\ with\ a\ value\ and\ color.\r\n\ The\ block's\ appearance\ is\ determined\ by\ its\ value\ and\ color.\r\n
+comment1.params=value\ color
+comment1.target=Block(int,\ BColor)
+comment1.text=\r\n\ Constructs\ a\ Block\ with\ the\ specified\ value\ and\ color.\r\n\ The\ block's\ image\ is\ set\ based\ on\ its\ value\ and\ color.\r\n\ \r\n\ @param\ value\ The\ value\ of\ the\ block.\r\n\ @param\ color\ The\ color\ of\ the\ block.\r\n
+comment2.params=
+comment2.target=void\ act()
+comment2.text=\r\n\ Defines\ the\ behavior\ of\ the\ Block.\r\n\ Currently,\ this\ method\ does\ not\ perform\ any\ actions.\r\n
+comment3.params=
+comment3.target=int\ getValue()
+comment3.text=\r\n\ Retrieves\ the\ value\ of\ the\ block.\r\n\ \r\n\ @return\ The\ value\ of\ the\ block.\r\n
+comment4.params=value
+comment4.target=void\ setValue(int)
+comment4.text=\r\n\ Sets\ the\ value\ of\ the\ block.\r\n\ \r\n\ @param\ value\ The\ new\ value\ of\ the\ block.\r\n
+comment5.params=
+comment5.target=BColor\ getColor()
+comment5.text=\r\n\ Retrieves\ the\ color\ of\ the\ block.\r\n\ \r\n\ @return\ The\ color\ of\ the\ block.\r\n
+comment6.params=color
+comment6.target=void\ setColor(BColor)
+comment6.text=\r\n\ Sets\ the\ color\ of\ the\ block.\r\n\ \r\n\ @param\ color\ The\ new\ color\ of\ the\ block.\r\n
+numComments=7

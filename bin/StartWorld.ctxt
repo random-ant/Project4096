@@ -1,0 +1,16 @@
+#BlueJ class context
+comment0.target=StartWorld
+comment0.text=\r\n\ Represents\ the\ starting\ world\ of\ the\ game,\ where\ players\ wait\ to\ begin.\r\n\ This\ world\ handles\ player\ readiness\ and\ transitions\ to\ the\ main\ game\ world.\r\n
+comment1.params=client\ game
+comment1.target=StartWorld(GameClient,\ Game)
+comment1.text=\r\n\ Constructs\ a\ StartWorld\ with\ the\ specified\ client\ and\ game\ instance.\r\n\ \r\n\ @param\ client\ The\ GameClient\ associated\ with\ this\ world.\r\n\ @param\ game\ \ \ The\ Game\ instance\ associated\ with\ this\ world.\r\n
+comment2.params=
+comment2.target=void\ act()
+comment2.text=\r\n\ Defines\ the\ behavior\ of\ the\ StartWorld.\r\n\ Checks\ if\ the\ Enter\ key\ is\ pressed\ to\ signal\ player\ readiness.\r\n
+comment3.params=
+comment3.target=GameWorld\ startGame()
+comment3.text=\r\n\ Starts\ the\ game\ and\ transitions\ to\ the\ GameWorld.\r\n\ \r\n\ @return\ The\ GameWorld\ instance\ that\ represents\ the\ main\ game\ world.\r\n
+comment4.params=game
+comment4.target=void\ setGame(Game)
+comment4.text=\r\n\ Sets\ the\ game\ instance\ for\ this\ world.\r\n\ \r\n\ @param\ game\ The\ Game\ instance\ to\ set.\r\n
+numComments=5

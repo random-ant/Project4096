@@ -1,0 +1,17 @@
+#BlueJ class context
+comment0.target=Animation
+comment1.params=frameRate\ frames
+comment1.target=Animation(int,\ java.lang.String[])
+comment2.params=
+comment2.target=int\ getFrameRate()
+comment3.params=
+comment3.target=mayflower.MayflowerImage\ getNextFrame()
+comment4.params=w\ h
+comment4.target=void\ scale(int,\ int)
+comment5.params=percent
+comment5.target=void\ setTransparency(int)
+comment6.params=
+comment6.target=void\ mirrorHorizontally()
+comment7.params=x\ y\ w\ h
+comment7.target=void\ setBounds(int,\ int,\ int,\ int)
+numComments=8

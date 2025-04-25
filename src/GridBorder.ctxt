@@ -1,0 +1,10 @@
+#BlueJ class context
+comment0.target=GridBorder
+comment0.text=\r\n\ Represents\ the\ border\ of\ the\ game\ grid.\r\n\ This\ class\ is\ responsible\ for\ displaying\ the\ grid\ border\ using\ an\ image.\r\n
+comment1.params=
+comment1.target=GridBorder()
+comment1.text=\r\n\ Constructs\ a\ GridBorder\ and\ sets\ its\ image.\r\n\ The\ image\ is\ scaled\ to\ fit\ the\ grid\ dimensions.\r\n
+comment2.params=
+comment2.target=void\ act()
+comment2.text=\r\n\ Defines\ the\ behavior\ of\ the\ GridBorder.\r\n\ Currently,\ this\ method\ does\ not\ perform\ any\ actions.\r\n
+numComments=3
