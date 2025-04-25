@@ -153,14 +153,6 @@ public class GameServer extends Server {
 				send(clientA, "youare RED");
 			}
 
-			// int INITIAL_BLOCKS = 2;
-			// for (int i = 0; i < INITIAL_BLOCKS; i++) {
-			// int[] block = game.spawnRandomBlock();
-			// game.addBlock(block[0], block[1], block[2], BColor.NEUTRAL);
-			// String message = "addblock " + block[0] + " " + block[1] + " " + block[2];
-			// send(clientA, message);
-			// send(clientB, message);
-			// }
 			send(clientA, "render");
 			send(clientB, "render");
 

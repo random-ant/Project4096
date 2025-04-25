@@ -48,10 +48,10 @@ public class GameWorld extends World {
 
         addObject(turnGraphic, 40, 55);
 
-        game.addBlock(1, 0, 2);
-        game.addBlock(2, 0, 2);
+        game.addBlock(1, 0, 2, BColor.NEUTRAL);
+        game.addBlock(2, 0, 2, BColor.NEUTRAL);
 
-        spawnRandomBlocks(10);
+        // spawnRandomBlocks(10);
         addWalls();
         renderBaseGrid();
         renderGrid();
@@ -255,12 +255,24 @@ public class GameWorld extends World {
             value = 8;
 
         ArrayList<Coordinate> empty = getEmptyTiles();
-        Collections.shuffle(empty, new Random(324392837));
+        Collections.shuffle(empty);
         for (int i = 0; i < numBlocks && i < empty.size(); i++) {
             Coordinate g = empty.get(i);
             game.getGrid()[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE);
+
+            String message = "addblock " + g.getRow() + " " + g.getCol() + " " + value;
+            client.send(message);
         }
     }
+
+    // public void spawnRandomBlocksAndSend(int numBlocks) {
+    // for (int i = 0; i < numBlocks; i++) {
+    // int[] block = game.spawnRandomBlock();
+
+    // game.getGrid()[block[0]][block[1]] = new Block(block[2], BColor.NEUTRAL);
+    // client.send(message);
+    // }
+    // }
 
     /**
      * Returns whether or not a key was newly pressed down on this frame
