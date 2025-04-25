@@ -40,16 +40,16 @@ public class Block extends Actor {
         setLocation(getX() + vx, getY() + vy);
 
         // if past target destination, snap to target destination and stop
-        if ((vy < 0 && getY() <= GameWorld.convertToPixels(this.targetDestination)[1])
-                || (vy > 0 && getY() >= GameWorld.convertToPixels(this.targetDestination)[1])
-                || (vx < 0 && getX() <= GameWorld.convertToPixels(this.targetDestination)[0])
-                || (vx > 0 && getX() >= GameWorld.convertToPixels(this.targetDestination)[0])) {
+        if ((vy < 0 && getY() <= GameWorld.convertToPixels(this.targetDestination).getY())
+                || (vy > 0 && getY() >= GameWorld.convertToPixels(this.targetDestination).getY())
+                || (vx < 0 && getX() <= GameWorld.convertToPixels(this.targetDestination).getX())
+                || (vx > 0 && getX() >= GameWorld.convertToPixels(this.targetDestination).getX())) {
             vx = 0;
             vy = 0;
             ax = 0;
             ay = 0;
-            double[] blockPixel = GameWorld.calculateBlockPixel(this.targetDestination);
-            setLocation(blockPixel[0], blockPixel[1]);
+            Coordinate blockPixel = GameWorld.calculateBlockPixel(this.targetDestination);
+            setLocation(blockPixel.getX(), blockPixel.getY());
 
             GameWorld w = (GameWorld) getWorld();
             w.removeMovingBlock(this);
