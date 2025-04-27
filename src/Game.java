@@ -39,8 +39,7 @@ public class Game {
             this.currentPlayer = BColor.BLUE;
         }
 
-        System.out.println("NEW PLAYER: " + currentPlayer.toString());
-
+        // System.out.println("NEW PLAYER: " + currentPlayer.toString());
         return this.currentPlayer;
     }
 

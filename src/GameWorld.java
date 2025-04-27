@@ -209,7 +209,6 @@ public class GameWorld extends World {
             game.getGrid()[coord.getRow()][coord.getCol()] = new Block(value, BColor.NEUTRAL);
         }
         queuedBlocksToSpawn.clear();
-        System.out.println("SPAWNED BLOCKS");
     }
 
     /**
