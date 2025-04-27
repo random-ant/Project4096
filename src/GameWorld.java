@@ -38,12 +38,12 @@ public class GameWorld extends World {
      * Blocks that need to spawn after animations are finished. Represented with a
      * Coordinate, then the blocks value. Used for randomly spawned blocks.
      */
-    private Map<Coordinate, Integer> queuedBlocksToSpawn;
+    private Map<Coordinate, MovableGridItem> queuedBlocksToSpawn;
 
     public GameWorld(GameClient client, Game game) {
         this.client = client;
         this.game = game;
-        queuedBlocksToSpawn = new HashMap<Coordinate, Integer>();
+        queuedBlocksToSpawn = new HashMap<Coordinate, MovableGridItem>();
 
         addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
@@ -117,8 +117,8 @@ public class GameWorld extends World {
                 int x_coord = converted.getX(), y_coord = converted.getY();
 
                 // add blocks
-                Block currBlock = game.getGrid()[i][j];
-                if (currBlock != null) {
+                MovableGridItem currBlock = game.getGrid()[i][j];
+                if (currBlock instanceof Block) {
                     addObject(currBlock, x_coord + BLOCK_BORDER_WIDTH, y_coord + BLOCK_BORDER_HEIGHT);
                 }
             }
@@ -155,9 +155,9 @@ public class GameWorld extends World {
         return new Coordinate(row_coord, col_coord);
     }
 
-    public void removeMovingBlock(Block b) {
-        Set<Block> currentlyMovingBlocks = game.getCurrentlyMovingBlocks();
-        ArrayList<Block> mergingStillBlocks = game.getMergingStillBlocks();
+    public void removeMovingBlock(MovableGridItem b) {
+        Set<MovableGridItem> currentlyMovingBlocks = game.getCurrentlyMovingBlocks();
+        ArrayList<MovableGridItem> mergingStillBlocks = game.getMergingStillBlocks();
         currentlyMovingBlocks.remove(b);
         removeObject(b);
         // System.out.println(currentlyMovingBlocks.size() + " left");
@@ -165,7 +165,7 @@ public class GameWorld extends World {
         // triggers once when all animations have been completed
         if (currentlyMovingBlocks.isEmpty()) {
             // remove all still blocks that need to be merged
-            for (Block still : mergingStillBlocks)
+            for (MovableGridItem still : mergingStillBlocks)
                 removeObject(still);
             mergingStillBlocks.clear();
 
@@ -202,11 +202,11 @@ public class GameWorld extends World {
     }
 
     private void spawnQueuedBlocks() {
-        for (Map.Entry<Coordinate, Integer> entry : queuedBlocksToSpawn.entrySet()) {
+        for (Map.Entry<Coordinate, MovableGridItem> entry : queuedBlocksToSpawn.entrySet()) {
             Coordinate coord = entry.getKey();
-            Integer value = entry.getValue();
+            MovableGridItem item = entry.getValue();
 
-            game.getGrid()[coord.getRow()][coord.getCol()] = new Block(value, BColor.NEUTRAL);
+            game.getGrid()[coord.getRow()][coord.getCol()] = item;
         }
         queuedBlocksToSpawn.clear();
     }
@@ -287,6 +287,7 @@ public class GameWorld extends World {
     }
 
     public void addQueuedBlock(int row, int col, int value) {
-        queuedBlocksToSpawn.put(new Coordinate(row, col), value);
+        Block b = new Block(value, BColor.NEUTRAL);
+        queuedBlocksToSpawn.put(new Coordinate(row, col), b);
     }
 }
