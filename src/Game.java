@@ -240,11 +240,11 @@ public class Game {
 
             // TODO: ADD CHECK FOR IF VALUE IS > 64 FROM BEFORE
             if (curr instanceof Block) {
-                Block prev = (Block) stack.peek();
-                while (!stack.empty() && prev.getValue() == ((Block) curr).getValue()) {
+                while (!stack.empty() && ((Block) stack.peek()).getValue() == ((Block) curr).getValue()) {
                     Block top = (Block) stack.pop();
-                    int newValue = top.getValue() * 2;
+                    positionShifts.put(top, Math.max(stack.size() - 1, 0));
 
+                    int newValue = top.getValue() * 2;
                     BColor newColor;
                     if (currentPlayer == BColor.BLUE) { // if BLUE's turn
                         newColor = BColor.BLUE;
@@ -255,9 +255,6 @@ public class Game {
                     }
 
                     Block newBlock = new Block(newValue, newColor);
-
-                    positionShifts.put(prev, Math.max(stack.size() - 1, 0));
-
                     curr = newBlock;
                 }
             }
@@ -291,12 +288,10 @@ public class Game {
                 b.setTargetDestination(null);
 
                 // only delete the object if it is going to be merged into something
-                if (blocks.get(i).getValue() != result.get(i).getValue()) {
-                    // removeObject(b);
+                if (blocks.get(i) instanceof Block && result.get(i) instanceof Block
+                        && ((Block) blocks.get(i)).getValue() != ((Block) result.get(i)).getValue()) {
                     mergingStillBlocks.add(b);
                 }
-
-                continue;
             } else if (isVertical) {
                 b.setTargetDestination(new Coordinate(target, lineIndex));
             } else if (!isVertical) {
