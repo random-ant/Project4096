@@ -1,18 +1,12 @@
 import mayflower.*;
 
-public class Block extends Actor {
-
+public class Block extends MovableGridItem {
     private int value;
     private BColor color;
-    private Coordinate targetDestination;
-    private double vx, vy;
-    private double ax, ay;
 
     public Block(int value, BColor color) {
         this.value = value;
         this.color = color;
-        this.targetDestination = null;
-        vx = vy = ax = ay = 0;
 
         if (color == BColor.NEUTRAL) {
             MayflowerImage img = new MayflowerImage("src/img/blocks/neutral/neutral-block" + value + ".png");
@@ -34,34 +28,32 @@ public class Block extends Actor {
     }
 
     public void act() {
-        // Update the block's position based on its velocity and acceleration
-        vx += ax;
-        vy += ay;
-        setLocation(getX() + vx, getY() + vy);
-
-        // if past target destination, snap to target destination and stop
-        if ((vy < 0 && getY() <= GameWorld.convertToPixels(this.targetDestination).getY())
-                || (vy > 0 && getY() >= GameWorld.convertToPixels(this.targetDestination).getY())
-                || (vx < 0 && getX() <= GameWorld.convertToPixels(this.targetDestination).getX())
-                || (vx > 0 && getX() >= GameWorld.convertToPixels(this.targetDestination).getX())) {
-            vx = 0;
-            vy = 0;
-            ax = 0;
-            ay = 0;
-            Coordinate blockPixel = GameWorld.calculateBlockPixel(this.targetDestination);
-            setLocation(blockPixel.getX(), blockPixel.getY());
-
-            GameWorld w = (GameWorld) getWorld();
-            w.removeMovingBlock(this);
-        }
+        super.act();
     }
 
-    public Coordinate getTargetDestination() {
-        return targetDestination;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + value;
+        result = prime * result + ((color == null) ? 0 : color.hashCode());
+        return result;
     }
 
-    public void setTargetDestination(Coordinate targetDestination) {
-        this.targetDestination = targetDestination;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Block other = (Block) obj;
+        if (value != other.value)
+            return false;
+        if (color != other.color)
+            return false;
+        return true;
     }
 
     public int getValue() {
@@ -79,22 +71,4 @@ public class Block extends Actor {
     public void setColor(BColor color) {
         this.color = color;
     }
-
-    public void setAx(double ax) {
-        this.ax = ax;
-    }
-
-    public void setAy(double ay) {
-        this.ay = ay;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + value;
-        result = prime * result + ((targetDestination == null) ? 0 : targetDestination.hashCode());
-        return result;
-    }
-
 }

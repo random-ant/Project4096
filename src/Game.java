@@ -6,12 +6,12 @@ import java.util.*;
 public class Game {
     private int GRID_WIDTH = GameWorld.GRID_WIDTH, GRID_HEIGHT = GameWorld.GRID_HEIGHT;
     private int blueScore = 0, redScore = 0;
-    private Block[][] grid;
+    private MovableGridItem[][] grid;
     private BColor currentPlayer;
     private BColor myColor;
 
-    private ArrayList<Block> mergingStillBlocks = new ArrayList<Block>();
-    private Set<Block> currentlyMovingBlocks = new HashSet<Block>();
+    private ArrayList<MovableGridItem> mergingStillBlocks = new ArrayList<MovableGridItem>();
+    private Set<MovableGridItem> currentlyMovingBlocks = new HashSet<MovableGridItem>();
 
     /**
      * The walls of the grid. The location of the walls is stored as a coordinate
@@ -20,7 +20,7 @@ public class Game {
     private Set<Coordinate> topWalls, leftWalls;
 
     public Game() {
-        this.grid = new Block[GRID_HEIGHT][GRID_WIDTH];
+        this.grid = new MovableGridItem[GRID_HEIGHT][GRID_WIDTH];
         this.currentPlayer = BColor.BLUE;
         topWalls = new HashSet<Coordinate>();
         leftWalls = new HashSet<Coordinate>();
@@ -56,18 +56,18 @@ public class Game {
 
     private void shiftBlocksUp() {
         for (int j = 0; j < GRID_WIDTH; j++) {
-            ArrayList<Block> col = new ArrayList<Block>();
-            ArrayList<Block> result = new ArrayList<Block>();
+            ArrayList<MovableGridItem> col = new ArrayList<MovableGridItem>();
+            ArrayList<MovableGridItem> result = new ArrayList<MovableGridItem>();
             int startOfChain = 0;
 
             for (int i = 0; i <= GRID_HEIGHT; i++) {
                 // when there's a wall, merge what we already have
                 if (topWalls.contains(new Coordinate(i, j)) || i == GRID_HEIGHT) {
-                    ArrayList<Block> toAdd = mergeLine(col, j, startOfChain, true, false);
+                    ArrayList<MovableGridItem> toAdd = mergeLine(col, j, startOfChain, true, false);
                     result.addAll(toAdd);
 
                     // add empty blocks
-                    result.addAll(Arrays.asList(new Block[i - result.size()]));
+                    result.addAll(Arrays.asList(new MovableGridItem[i - result.size()]));
 
                     updateBlockVelocities(col, true);
 
@@ -90,18 +90,18 @@ public class Game {
 
     private void shiftBlocksDown() {
         for (int j = 0; j < GRID_WIDTH; j++) {
-            ArrayList<Block> col = new ArrayList<Block>();
-            ArrayList<Block> result = new ArrayList<Block>();
+            ArrayList<MovableGridItem> col = new ArrayList<MovableGridItem>();
+            ArrayList<MovableGridItem> result = new ArrayList<MovableGridItem>();
             int startOfChain = GRID_HEIGHT;
 
             for (int i = GRID_HEIGHT - 1; i >= 0; i--) {
                 col.add(grid[i][j]);
 
                 if (topWalls.contains(new Coordinate(i, j)) || i == 0) {
-                    ArrayList<Block> toAdd = mergeLine(col, j, startOfChain, true, true);
+                    ArrayList<MovableGridItem> toAdd = mergeLine(col, j, startOfChain, true, true);
                     // add empty blocks
                     result.addAll(toAdd);
-                    result.addAll(Arrays.asList(new Block[GRID_HEIGHT - i - result.size()]));
+                    result.addAll(Arrays.asList(new MovableGridItem[GRID_HEIGHT - i - result.size()]));
 
                     updateBlockVelocities(col, true);
 
@@ -121,16 +121,16 @@ public class Game {
 
     private void shiftBlocksLeft() {
         for (int i = 0; i < GRID_HEIGHT; i++) {
-            ArrayList<Block> row = new ArrayList<Block>();
-            ArrayList<Block> result = new ArrayList<Block>();
+            ArrayList<MovableGridItem> row = new ArrayList<MovableGridItem>();
+            ArrayList<MovableGridItem> result = new ArrayList<MovableGridItem>();
             int startOfChain = 0;
 
             for (int j = 0; j <= GRID_WIDTH; j++) {
                 if (leftWalls.contains(new Coordinate(i, j)) || j == GRID_WIDTH) {
-                    ArrayList<Block> toAdd = mergeLine(row, i, startOfChain, false, false);
+                    ArrayList<MovableGridItem> toAdd = mergeLine(row, i, startOfChain, false, false);
                     result.addAll(toAdd);
                     // add empty blocks
-                    result.addAll(Arrays.asList(new Block[j - result.size()]));
+                    result.addAll(Arrays.asList(new MovableGridItem[j - result.size()]));
 
                     updateBlockVelocities(row, false);
 
@@ -152,18 +152,18 @@ public class Game {
 
     private void shiftBlocksRight() {
         for (int i = 0; i < GRID_HEIGHT; i++) {
-            ArrayList<Block> row = new ArrayList<Block>();
-            ArrayList<Block> result = new ArrayList<Block>();
+            ArrayList<MovableGridItem> row = new ArrayList<MovableGridItem>();
+            ArrayList<MovableGridItem> result = new ArrayList<MovableGridItem>();
             int startOfChain = GRID_WIDTH;
 
             for (int j = GRID_WIDTH - 1; j >= 0; j--) {
                 row.add(grid[i][j]);
 
                 if (leftWalls.contains(new Coordinate(i, j)) || j == 0) {
-                    ArrayList<Block> toAdd = mergeLine(row, i, startOfChain, false, true);
+                    ArrayList<MovableGridItem> toAdd = mergeLine(row, i, startOfChain, false, true);
                     result.addAll(toAdd);
                     // add empty blocks
-                    result.addAll(Arrays.asList(new Block[GRID_WIDTH - j - result.size()]));
+                    result.addAll(Arrays.asList(new MovableGridItem[GRID_WIDTH - j - result.size()]));
 
                     updateBlockVelocities(row, false);
 
@@ -181,12 +181,12 @@ public class Game {
         }
     }
 
-    private void updateBlockVelocities(ArrayList<Block> line, boolean isVertical) {
+    private void updateBlockVelocities(ArrayList<MovableGridItem> line, boolean isVertical) {
         double ANIMATION_TIME = 8.5;
         double initialVelocity = 0;
 
         // update velocities of blocks
-        for (Block b : line) {
+        for (MovableGridItem b : line) {
             if (b == null || b.getTargetDestination() == null)
                 continue;
 
@@ -226,41 +226,47 @@ public class Game {
      * @return An {@code ArrayList} of merged blocks. All empty blocks will have
      *         been removed.
      */
-    public ArrayList<Block> mergeLine(ArrayList<Block> blocks, int lineIndex, int offsetIndex, boolean isVertical,
+    public ArrayList<MovableGridItem> mergeLine(ArrayList<MovableGridItem> blocks, int lineIndex, int offsetIndex,
+            boolean isVertical,
             boolean isBackwards) {
-        Stack<Block> stack = new Stack<Block>();
+        Stack<MovableGridItem> stack = new Stack<MovableGridItem>();
         // index in row -> new index in row
-        Map<Block, Integer> positionShifts = new HashMap<Block, Integer>();
+        Map<MovableGridItem, Integer> positionShifts = new HashMap<MovableGridItem, Integer>();
 
         for (int i = 0; i < blocks.size(); i++) {
-            Block currentBlock = blocks.get(i);
-            if (currentBlock == null)
+            MovableGridItem curr = blocks.get(i);
+            if (curr == null)
                 continue;
 
             // TODO: ADD CHECK FOR IF VALUE IS > 64 FROM BEFORE
+            if (curr instanceof Block) {
+                Block prev = (Block) stack.peek();
+                while (!stack.empty() && prev.getValue() == ((Block) curr).getValue()) {
+                    Block top = (Block) stack.pop();
+                    int newValue = top.getValue() * 2;
 
-            while (!stack.empty() && stack.peek().getValue() == currentBlock.getValue()) {
-                Block top = stack.pop();
-                positionShifts.put(top, Math.max(stack.size() - 1, 0));
-                int newValue = top.getValue() * 2;
-                BColor newColor;
+                    BColor newColor;
+                    if (currentPlayer == BColor.BLUE) { // if BLUE's turn
+                        newColor = BColor.BLUE;
+                        blueScore += newValue;
+                    } else {
+                        newColor = BColor.RED;
+                        redScore += newValue;
+                    }
 
-                if (currentPlayer == BColor.BLUE) { // if BLUE's turn
-                    newColor = BColor.BLUE;
-                    blueScore += newValue;
-                } else {
-                    newColor = BColor.RED;
-                    redScore += newValue;
+                    Block newBlock = new Block(newValue, newColor);
+
+                    positionShifts.put(prev, Math.max(stack.size() - 1, 0));
+
+                    curr = newBlock;
                 }
-
-                Block newBlock = new Block(newValue, newColor);
-                currentBlock = newBlock;
             }
-            stack.add(currentBlock);
+
+            stack.add(curr);
             positionShifts.put(blocks.get(i), stack.size() - 1);
         }
 
-        ArrayList<Block> result = new ArrayList<Block>();
+        ArrayList<MovableGridItem> result = new ArrayList<MovableGridItem>();
         // add stack elements to result array
         while (!stack.empty())
             result.add(stack.pop());
@@ -272,7 +278,7 @@ public class Game {
             if (blocks.get(i) == null)
                 continue;
 
-            Block b = blocks.get(i);
+            MovableGridItem b = blocks.get(i);
             int target = -1;
             if (!isBackwards)
                 target = positionShifts.get(b) + offsetIndex;
@@ -332,11 +338,11 @@ public class Game {
         return true;
     }
 
-    public void setBlock(int row, int col, Block block) {
+    public void setBlock(int row, int col, MovableGridItem block) {
         this.grid[row][col] = block;
     }
 
-    public Block getBlock(int row, int col) {
+    public MovableGridItem getBlock(int row, int col) {
         if ((row < 0) || (col < 0) || (row >= GRID_HEIGHT) || (GRID_WIDTH >= 3)) {
             return null;
         }
@@ -378,22 +384,7 @@ public class Game {
         }
     }
 
-    public void printGrid() {
-        for (int i = 0; i < GRID_HEIGHT; i++) {
-            for (int j = 0; j < GRID_WIDTH; j++) {
-                Block b = grid[i][j];
-                if (b == null)
-                    System.out.print("-");
-                else
-                    System.out.print(b.getValue());
-                System.out.print("\t");
-            }
-            System.out.println();
-        }
-        System.out.println("-----------------------------------");
-    }
-
-    public Block[][] getGrid() {
+    public MovableGridItem[][] getGrid() {
         return grid;
     }
 
@@ -413,11 +404,11 @@ public class Game {
         return leftWalls;
     }
 
-    public ArrayList<Block> getMergingStillBlocks() {
+    public ArrayList<MovableGridItem> getMergingStillBlocks() {
         return mergingStillBlocks;
     }
 
-    public Set<Block> getCurrentlyMovingBlocks() {
+    public Set<MovableGridItem> getCurrentlyMovingBlocks() {
         return currentlyMovingBlocks;
     }
 
