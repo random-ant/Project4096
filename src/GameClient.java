@@ -21,20 +21,12 @@ public class GameClient extends Client {
         connect(ip, port);
         // connect("localhost", port);
 
-        // in.close();
+        in.close();
     }
 
     public GameClient(String ip) {
-
-        // System.out.print("Port > ");
-        // int port = in.nextInt();
         int port = 1234; // default server port
-
-        // System.out.println("Connecting...");
         connect(ip, port);
-        // connect("localhost", port);
-
-        // in.close();
     }
 
     public void process(String message) {
@@ -85,9 +77,8 @@ public class GameClient extends Client {
             int row = Integer.parseInt(parts[1]);
             int col = Integer.parseInt(parts[2]);
             int val = Integer.parseInt(parts[3]);
-            if (game.getBlock(row, col) == null) {
-                game.addBlock(row, col, val, BColor.NEUTRAL);
-            }
+
+            world.addQueuedBlock(row, col, val);
         } else if ("render".equals(parts[0])) {
             world.renderGrid();
         } else if ("error".equals(parts[0])) {

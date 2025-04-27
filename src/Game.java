@@ -39,8 +39,7 @@ public class Game {
             this.currentPlayer = BColor.BLUE;
         }
 
-        System.out.println("NEW PLAYER: " + currentPlayer.toString());
-
+        // System.out.println("NEW PLAYER: " + currentPlayer.toString());
         return this.currentPlayer;
     }
 
@@ -185,7 +184,6 @@ public class Game {
     private void updateBlockVelocities(ArrayList<Block> line, boolean isVertical) {
         double ANIMATION_TIME = 8.5;
         double initialVelocity = 0;
-        // ANIMATION_TIME = 200;
 
         // update velocities of blocks
         for (Block b : line) {
@@ -200,22 +198,12 @@ public class Game {
                         / (ANIMATION_TIME * ANIMATION_TIME);
 
                 b.setAy(acceleration);
-
-                // System.out.println(
-                // "initialPos: " + initialPos + ", finalPos: (" +
-                // b.getTargetDestination().getCol() + ","
-                // + b.getTargetDestination().getRow() + ") acceleration: " + acceleration);
             } else {
                 double initialPos = b.getX();
                 double finalPos = GameWorld.calculateBlockPixel(b.getTargetDestination()).getX();
                 double acceleration = 2 * (finalPos - initialPos) / (ANIMATION_TIME * ANIMATION_TIME);
 
                 b.setAx(acceleration);
-
-                // System.out.println(
-                // "initialPos: " + initialPos + ", finalPos: (" +
-                // b.getTargetDestination().getCol() + ","
-                // + b.getTargetDestination().getRow() + ") acceleration: " + acceleration);
             }
 
             currentlyMovingBlocks.add(b);
@@ -381,7 +369,6 @@ public class Game {
     public void merge(Direction dir) {
         if (dir == Direction.UP) {
             shiftBlocksUp();
-
         } else if (dir == Direction.DOWN) {
             shiftBlocksDown();
         } else if (dir == Direction.LEFT) {
@@ -391,34 +378,7 @@ public class Game {
         }
     }
 
-    public Coordinate getRandomEmptyTile() {
-        ArrayList<Coordinate> empty = getEmptyTiles();
-        int numEmpty = empty.size();
-        int randomIndex = (int) (Math.random() * numEmpty);
-        return empty.get(randomIndex);
-    }
-
-    public int[] spawnRandomBlock() {
-        double spawnValue = Math.random();
-        int value;
-        if (spawnValue <= 0.7) {
-            value = 2;
-        } else if (spawnValue <= 0.9) {
-            value = 4;
-        } else {
-            value = 8;
-        }
-        // Block block = new Block(value, BColor.BLUE, getRandomEmptyTile());
-        Coordinate g = getRandomEmptyTile();
-        int row = g.getRow();
-        int col = g.getCol();
-        grid[row][col] = new Block(value, BColor.NEUTRAL);
-
-        int[] ret = { row, col, value };
-        return ret;
-    }
-
-    private void printGrid() {
+    public void printGrid() {
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 Block b = grid[i][j];

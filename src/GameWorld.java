@@ -34,9 +34,16 @@ public class GameWorld extends World {
      */
     private int BLOCKS_SPAWNED_PER_MOVE = 3;
 
+    /**
+     * Blocks that need to spawn after animations are finished. Represented with a
+     * Coordinate, then the blocks value. Used for randomly spawned blocks.
+     */
+    private Map<Coordinate, Integer> queuedBlocksToSpawn;
+
     public GameWorld(GameClient client, Game game) {
         this.client = client;
         this.game = game;
+        queuedBlocksToSpawn = new HashMap<Coordinate, Integer>();
 
         addObject(new GridBorder(), 40, 245);
         addObject(new Title(), 301, 55);
@@ -48,10 +55,9 @@ public class GameWorld extends World {
 
         addObject(turnGraphic, 40, 55);
 
-        game.addBlock(1, 0, 2);
-        game.addBlock(2, 0, 2);
+        game.addBlock(1, 0, 2, BColor.NEUTRAL);
+        game.addBlock(2, 0, 2, BColor.NEUTRAL);
 
-        spawnRandomBlocks(10);
         addWalls();
         renderBaseGrid();
         renderGrid();
@@ -163,65 +169,60 @@ public class GameWorld extends World {
                 removeObject(still);
             mergingStillBlocks.clear();
 
-            spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
-
-            // printGrid();
+            spawnQueuedBlocks();
             renderGrid();
-
-            // game.nextPlayer();
-            // turnGraphic.setTurn(BColor.NEUTRAL);
-            // spawnRandomBlocksAndSend(2);
         }
     }
 
     @Override
     public void act() {
-        // if not player's turn, don't allow anything to happen
-        if (!game.isTurn())
+        // if not player's turn OR in the middle of an animation, don't allow anything
+        // to happen
+        if (!game.isTurn() || !game.getCurrentlyMovingBlocks().isEmpty())
             return;
-
-        // if in the middle of an animation, disregard key presses\
-        // TODO: might slow down game
-        // if (!game.getCurrentlyMovingBlocks().isEmpty())
-        // return;
 
         // listen for key presses and act accordingly
         if (keyPressed(Keyboard.KEY_UP)) {
             game.merge(Direction.UP);
             client.send("move " + Direction.UP);
-            game.swapActivePlayer();
-            if (game.isTurn()) {
-                turnGraphic.setTurn(game.getMyColor());
-            } else {
-                turnGraphic.setTurn(BColor.NEUTRAL);
-            }
+            spawnAndSwap();
         } else if (keyPressed(Keyboard.KEY_DOWN)) {
             game.merge(Direction.DOWN);
             client.send("move " + Direction.DOWN);
-            game.swapActivePlayer();
-            if (game.isTurn()) {
-                turnGraphic.setTurn(game.getMyColor());
-            } else {
-                turnGraphic.setTurn(BColor.NEUTRAL);
-            }
+            spawnAndSwap();
         } else if (keyPressed(Keyboard.KEY_LEFT)) {
             game.merge(Direction.LEFT);
             client.send("move " + Direction.LEFT);
-            game.swapActivePlayer();
-            if (game.isTurn()) {
-                turnGraphic.setTurn(game.getMyColor());
-            } else {
-                turnGraphic.setTurn(BColor.NEUTRAL);
-            }
+            spawnAndSwap();
         } else if (keyPressed(Keyboard.KEY_RIGHT)) {
             game.merge(Direction.RIGHT);
             client.send("move " + Direction.RIGHT);
-            game.swapActivePlayer();
-            if (game.isTurn()) {
-                turnGraphic.setTurn(game.getMyColor());
-            } else {
-                turnGraphic.setTurn(BColor.NEUTRAL);
-            }
+            spawnAndSwap();
+        }
+    }
+
+    private void spawnQueuedBlocks() {
+        for (Map.Entry<Coordinate, Integer> entry : queuedBlocksToSpawn.entrySet()) {
+            Coordinate coord = entry.getKey();
+            Integer value = entry.getValue();
+
+            game.getGrid()[coord.getRow()][coord.getCol()] = new Block(value, BColor.NEUTRAL);
+        }
+        queuedBlocksToSpawn.clear();
+    }
+
+    /**
+     * Helper method to spawn random blocks in, then swap whose
+     * turn it is.
+     */
+    private void spawnAndSwap() {
+        spawnRandomBlocks(BLOCKS_SPAWNED_PER_MOVE);
+
+        game.swapActivePlayer();
+        if (game.isTurn()) {
+            turnGraphic.setTurn(game.getMyColor());
+        } else {
+            turnGraphic.setTurn(BColor.NEUTRAL);
         }
     }
 
@@ -240,7 +241,7 @@ public class GameWorld extends World {
     /**
      * Spawn a certain amount of blocks into the grid. Blocks will be randomly
      * placed into empty tiles. If there are no more empty tiles, nothing will
-     * happen.
+     * happen. Sends the blocks created over the client to be placed.
      * 
      * @param numBlocks number of blocks to spawn in
      */
@@ -255,10 +256,17 @@ public class GameWorld extends World {
             value = 8;
 
         ArrayList<Coordinate> empty = getEmptyTiles();
-        Collections.shuffle(empty, new Random(324392837));
+        Collections.shuffle(empty);
         for (int i = 0; i < numBlocks && i < empty.size(); i++) {
             Coordinate g = empty.get(i);
-            game.getGrid()[g.getRow()][g.getCol()] = new Block(value, BColor.BLUE);
+            int row = g.getRow(), col = g.getCol();
+
+            // queue the blocks up to be spawned
+            addQueuedBlock(row, col, value);
+
+            // send spawned blocks to other client
+            String message = "addblock " + row + " " + col + " " + value;
+            client.send(message);
         }
     }
 
@@ -278,4 +286,7 @@ public class GameWorld extends World {
         return turnGraphic;
     }
 
+    public void addQueuedBlock(int row, int col, int value) {
+        queuedBlocksToSpawn.put(new Coordinate(row, col), value);
+    }
 }

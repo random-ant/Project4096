@@ -17,7 +17,6 @@ public class GameServer extends Server {
 		redClients = new HashSet<Integer>();
 
 		System.out.println("Waiting for clients on port " + getPort() + " at " + getIP());
-
 	}
 
 	/*
@@ -37,12 +36,7 @@ public class GameServer extends Server {
 		String[] parts = message.trim().split(" ");
 		// check if client is in a game and if that game is not over
 		if (game != null || "ready".equals(parts[0])) {
-			// check if it is this players turn
-
-			// if (curr == player) {
-			// parse the row and col from the message
 			try {
-				// Integer.parseInt() can throw an exception
 				if ("addblock".equals(parts[0])) {
 					int row = Integer.parseInt(parts[1]);
 					int col = Integer.parseInt(parts[2]);
@@ -50,35 +44,16 @@ public class GameServer extends Server {
 
 					// check if a piece can be placed at (row, col)
 					if (null == game.getBlock(row, col)) {
-
-						// FIX FIX
-
 						game.addBlock(row, col, val, BColor.NEUTRAL);
-
-						// broadcast this move to both clients in this game
 						String response = "addblock " + row + " " + col + " " + val;
-						// send(id, response);
 						send(otherPlayer.get(id), response);
-
 					} else {
 						send(id, "error location is occupied: [" + message + "]");
 					}
 				} else if ("move".equals(parts[0])) {
-
 					String dir = parts[1];
-					if ("UP".equals(dir)) {
-						game.merge(Direction.UP);
-					} else if ("DOWN".equals(dir)) {
-						game.merge(Direction.DOWN);
-					} else if ("LEFT".equals(dir)) {
-						game.merge(Direction.LEFT);
-					} else if ("RIGHT".equals(dir)) {
-						game.merge(Direction.RIGHT);
-					}
 
-					// response
 					String response = "move " + dir;
-					// send(id, response);
 					send(otherPlayer.get(id), response);
 				} else if ("render".equals(parts[0])) {
 					send(otherPlayer.get(id), "render");
@@ -153,14 +128,6 @@ public class GameServer extends Server {
 				send(clientA, "youare RED");
 			}
 
-			// int INITIAL_BLOCKS = 2;
-			// for (int i = 0; i < INITIAL_BLOCKS; i++) {
-			// int[] block = game.spawnRandomBlock();
-			// game.addBlock(block[0], block[1], block[2], BColor.NEUTRAL);
-			// String message = "addblock " + block[0] + " " + block[1] + " " + block[2];
-			// send(clientA, message);
-			// send(clientB, message);
-			// }
 			send(clientA, "render");
 			send(clientB, "render");
 
