@@ -2,11 +2,17 @@ import java.util.Scanner;
 
 import mayflower.net.*;
 
+/**
+ * Handles the client-side logic for the multiplayer game.
+ */
 public class GameClient extends Client {
     private GameWorld world;
     private StartWorld start;
     private Game game;
 
+    /**
+     * Constructs a GameClient instance and connects to the server.
+     */
     public GameClient() {
         Scanner in = new Scanner(System.in);
         System.out.println("Use localhost to connect to a server running on your computer.");
@@ -24,11 +30,21 @@ public class GameClient extends Client {
         in.close();
     }
 
+    /**
+     * Constructs a GameClient instance and connects to the specified server IP.
+     *
+     * @param ip The IP address of the server.
+     */
     public GameClient(String ip) {
         int port = 1234; // default server port
         connect(ip, port);
     }
 
+    /**
+     * Processes messages received from the server.
+     *
+     * @param message The message received from the server.
+     */
     public void process(String message) {
         // "youare RED/BLUE"
         // "move UP/DOWN/LEFT/RIGHT"
@@ -89,10 +105,18 @@ public class GameClient extends Client {
 
     }
 
+    /**
+     * Called when the client disconnects from the server.
+     *
+     * @param message The disconnection message.
+     */
     public void onDisconnect(String message) {
         System.out.println("Disconnected from server.");
     }
 
+    /**
+     * Called when the client successfully connects to the server.
+     */
     public void onConnect() {
         System.out.println("Connected!");
     }

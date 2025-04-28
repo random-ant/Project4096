@@ -1,7 +1,16 @@
+/**
+ * Represents a coordinate in the game grid.
+ */
 public class Coordinate {
     private int row;
     private int col;
 
+    /**
+     * Constructs a coordinate with the specified row and column.
+     *
+     * @param row The row of the coordinate.
+     * @param col The column of the coordinate.
+     */
     public Coordinate(int row, int col) {
         this.row = row;
         this.col = col;
@@ -32,18 +41,38 @@ public class Coordinate {
         return true;
     }
 
+    /**
+     * Gets the row of the coordinate.
+     *
+     * @return The row of the coordinate.
+     */
     public int getRow() {
         return row;
     }
 
+    /**
+     * Sets the row of the coordinate.
+     *
+     * @param row The new row of the coordinate.
+     */
     public void setRow(int row) {
         this.row = row;
     }
 
+    /**
+     * Gets the column of the coordinate.
+     *
+     * @return The column of the coordinate.
+     */
     public int getCol() {
         return col;
     }
 
+    /**
+     * Sets the column of the coordinate.
+     *
+     * @param col The new column of the coordinate.
+     */
     public void setCol(int col) {
         this.col = col;
     }

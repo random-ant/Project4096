@@ -40,6 +40,12 @@ public class GameWorld extends World {
      */
     private Map<Coordinate, MovableGridItem> queuedBlocksToSpawn;
 
+    /**
+     * Constructs a GameWorld instance with the specified client and game.
+     *
+     * @param client The client associated with the game world.
+     * @param game   The game logic associated with the game world.
+     */
     public GameWorld(GameClient client, Game game) {
         this.client = client;
         this.game = game;
@@ -72,8 +78,6 @@ public class GameWorld extends World {
     private void addWalls() {
         Set<Coordinate> topWalls = game.getTopWalls();
         Set<Coordinate> leftWalls = game.getLeftWalls();
-        topWalls.add(new Coordinate(4, 0));
-        leftWalls.add(new Coordinate(0, 3));
     }
 
     /**
@@ -125,8 +129,8 @@ public class GameWorld extends World {
         }
 
         // update score text
-        showText("score blue: " + game.getBlueScore(), 550, 55, Color.BLACK);
-        showText("score red: " + game.getRedScore(), 550, 110, Color.BLACK);
+        showText("score blue: " + game.getBlueScore(), 500, 55, Color.BLACK);
+        showText("score red: " + game.getRedScore(), 500, 110, Color.BLACK);
     }
 
     /**
@@ -198,6 +202,13 @@ public class GameWorld extends World {
             game.merge(Direction.RIGHT);
             client.send("move " + Direction.RIGHT);
             spawnAndSwap();
+        }
+
+        // check if game is over
+        if (game.isGameOver()) {
+            BColor color = game.getMyColor();
+            boolean win = game.getWinner() == color;
+            Mayflower.setWorld(new EndWorld(win, color));
         }
     }
 

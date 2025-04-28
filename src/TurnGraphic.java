@@ -1,9 +1,17 @@
 import mayflower.*;
 
+/**
+ * Represents the turn indicator graphic in the game.
+ */
 public class TurnGraphic extends Actor {
-    BColor turn;
+    private BColor turn;
     private MayflowerImage turnBlueImg, turnRedImg, turnNeutralImg;
 
+    /**
+     * Constructs a TurnGraphic instance with the specified initial turn color.
+     *
+     * @param color The initial turn color.
+     */
     public TurnGraphic(BColor color) {
         turnBlueImg = new MayflowerImage("src/img/turnBoardBlue.png");
         turnRedImg = new MayflowerImage("src/img/turnBoardRed.png");

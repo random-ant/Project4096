@@ -1,7 +1,10 @@
+import java.sql.ClientInfoStatus;
 import java.util.*;
 
 /**
- * The data for the game
+ * Represents the game logic and data for the multiplayer game.
+ * This class manages the game grid, player turns, scores, and block merging
+ * logic.
  */
 public class Game {
     private int GRID_WIDTH = GameWorld.GRID_WIDTH, GRID_HEIGHT = GameWorld.GRID_HEIGHT;
@@ -10,27 +13,30 @@ public class Game {
     private BColor currentPlayer;
     private BColor myColor;
 
-    private ArrayList<MovableGridItem> mergingStillBlocks = new ArrayList<MovableGridItem>();
-    private Set<MovableGridItem> currentlyMovingBlocks = new HashSet<MovableGridItem>();
+    private ArrayList<MovableGridItem> mergingStillBlocks = new ArrayList<>();
+    private Set<MovableGridItem> currentlyMovingBlocks = new HashSet<>();
 
     /**
-     * The walls of the grid. The location of the walls is stored as a coordinate
-     * the block it is relative to.
+     * The walls of the grid. The location of the walls is stored as coordinates
+     * relative to the blocks.
      */
     private Set<Coordinate> topWalls, leftWalls;
 
+    /**
+     * Constructs a new game instance and initializes the grid and walls.
+     */
     public Game() {
         this.grid = new MovableGridItem[GRID_HEIGHT][GRID_WIDTH];
         this.currentPlayer = BColor.BLUE;
-        topWalls = new HashSet<Coordinate>();
-        leftWalls = new HashSet<Coordinate>();
+        topWalls = new HashSet<>();
+        leftWalls = new HashSet<>();
         addWalls();
     }
 
     /**
-     * Swaps who can make a move.
-     * 
-     * @return the {@code BColor} of the NEW active player
+     * Swaps the active player.
+     *
+     * @return The {@code BColor} of the new active player.
      */
     public BColor swapActivePlayer() {
         if (this.currentPlayer == BColor.BLUE) {
@@ -38,20 +44,50 @@ public class Game {
         } else if (this.currentPlayer == BColor.RED) {
             this.currentPlayer = BColor.BLUE;
         }
-
-        // System.out.println("NEW PLAYER: " + currentPlayer.toString());
         return this.currentPlayer;
     }
 
     /**
      * Adds walls to the grid. This method should be called when the game world is
      * first created.
-     * 
-     * @return void
      */
     private void addWalls() {
-        topWalls.add(new Coordinate(4, 0));
-        leftWalls.add(new Coordinate(0, 3));
+        topWalls.add(new Coordinate(1, 3));
+        topWalls.add(new Coordinate(3, 0));
+        topWalls.add(new Coordinate(5, 2));
+        topWalls.add(new Coordinate(7, 4));
+        topWalls.add(new Coordinate(9, 0));
+
+        leftWalls.add(new Coordinate(0, 9));
+        leftWalls.add(new Coordinate(3, 7));
+        leftWalls.add(new Coordinate(2, 4));
+        leftWalls.add(new Coordinate(5, 2));
+        leftWalls.add(new Coordinate(7, 8));
+    }
+
+    /**
+     * Checks if the game is over.
+     *
+     * @return {@code true} if the game is over, {@code false} otherwise.
+     */
+    public boolean isGameOver() {
+        return (blueScore >= 4096 || redScore >= 4096);
+    }
+
+    /**
+     * Gets the winner of the game.
+     *
+     * @return The color of the winning player, or {@code NEUTRAL} if no winner.
+     */
+    public BColor getWinner() {
+        if (isGameOver()) {
+            if (blueScore >= 4096) {
+                return BColor.BLUE;
+            } else if (redScore >= 4096) {
+                return BColor.RED;
+            }
+        }
+        return BColor.NEUTRAL;
     }
 
     private void shiftBlocksUp() {
@@ -318,10 +354,30 @@ public class Game {
         currentPlayer = player;
     }
 
+    /**
+     * Adds a block to the grid at the specified position with the current player's
+     * color.
+     *
+     * @param row   The row index of the block.
+     * @param col   The column index of the block.
+     * @param value The value of the block.
+     * @return {@code true} if the block was added successfully, {@code false}
+     *         otherwise.
+     */
     public boolean addBlock(int row, int col, int value) {
         return addBlock(row, col, value, currentPlayer);
     }
 
+    /**
+     * Adds a block to the grid at the specified position with the specified color.
+     *
+     * @param row   The row index of the block.
+     * @param col   The column index of the block.
+     * @param value The value of the block.
+     * @param color The color of the block.
+     * @return {@code true} if the block was added successfully, {@code false}
+     *         otherwise.
+     */
     public boolean addBlock(int row, int col, int value, BColor color) {
         if (null != getBlock(row, col)) {
             return false;
@@ -333,17 +389,38 @@ public class Game {
         return true;
     }
 
+    /**
+     * Sets a block at the specified position in the grid.
+     *
+     * @param row   The row index of the block.
+     * @param col   The column index of the block.
+     * @param block The block to set.
+     */
     public void setBlock(int row, int col, MovableGridItem block) {
         this.grid[row][col] = block;
     }
 
+    /**
+     * Gets the block at the specified position in the grid.
+     *
+     * @param row The row index of the block.
+     * @param col The column index of the block.
+     * @return The block at the specified position, or {@code null} if no block
+     *         exists.
+     */
     public MovableGridItem getBlock(int row, int col) {
-        if ((row < 0) || (col < 0) || (row >= GRID_HEIGHT) || (GRID_WIDTH >= 3)) {
+        if ((row < 0) || (col < 0) || (row >= GRID_HEIGHT) || (col >= GRID_WIDTH)) {
             return null;
         }
         return this.grid[row][col];
     }
 
+    /**
+     * Checks if there is any empty space in the grid.
+     *
+     * @return {@code true} if there is at least one empty space, {@code false}
+     *         otherwise.
+     */
     public boolean hasEmptySpace() {
         for (int r = 0; r < this.grid.length; r++) {
             for (int c = 0; c < this.grid[r].length; c++) {
@@ -355,8 +432,13 @@ public class Game {
         return false;
     }
 
+    /**
+     * Gets a list of all empty tiles in the grid.
+     *
+     * @return A list of coordinates representing empty tiles.
+     */
     public ArrayList<Coordinate> getEmptyTiles() {
-        ArrayList<Coordinate> out = new ArrayList<Coordinate>(GRID_HEIGHT * GRID_WIDTH);
+        ArrayList<Coordinate> out = new ArrayList<>(GRID_HEIGHT * GRID_WIDTH);
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
                 if (grid[i][j] == null) {
@@ -367,6 +449,11 @@ public class Game {
         return out;
     }
 
+    /**
+     * Merges blocks in the specified direction.
+     *
+     * @param dir The direction to merge blocks.
+     */
     public void merge(Direction dir) {
         if (dir == Direction.UP) {
             shiftBlocksUp();
@@ -379,34 +466,75 @@ public class Game {
         }
     }
 
+    /**
+     * Gets the current game grid.
+     *
+     * @return A 2D array representing the game grid.
+     */
     public MovableGridItem[][] getGrid() {
         return grid;
     }
 
+    /**
+     * Gets the score of the blue player.
+     *
+     * @return The blue player's score.
+     */
     public int getBlueScore() {
         return blueScore;
     }
 
+    /**
+     * Gets the score of the red player.
+     *
+     * @return The red player's score.
+     */
     public int getRedScore() {
         return redScore;
     }
 
+    /**
+     * Gets the top walls of the grid.
+     *
+     * @return A set of coordinates representing the top walls.
+     */
     public Set<Coordinate> getTopWalls() {
         return topWalls;
     }
 
+    /**
+     * Gets the left walls of the grid.
+     *
+     * @return A set of coordinates representing the left walls.
+     */
     public Set<Coordinate> getLeftWalls() {
         return leftWalls;
     }
 
+    /**
+     * Gets the blocks that are currently merging but not moving.
+     *
+     * @return A list of blocks that are merging but stationary.
+     */
     public ArrayList<MovableGridItem> getMergingStillBlocks() {
         return mergingStillBlocks;
     }
 
+    /**
+     * Gets the blocks that are currently moving.
+     *
+     * @return A set of blocks that are moving.
+     */
     public Set<MovableGridItem> getCurrentlyMovingBlocks() {
         return currentlyMovingBlocks;
     }
 
+    /**
+     * Checks if it is the current player's turn.
+     *
+     * @return {@code true} if it is the current player's turn, {@code false}
+     *         otherwise.
+     */
     public boolean isTurn() {
         return myColor == currentPlayer;
     }
