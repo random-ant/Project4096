@@ -23,10 +23,11 @@ public class GameServer extends Server {
 	 * Do something with a message sent from a client
 	 *
 	 * Allowed Messages:
-	 * play row col
+	 * addblock row col val
+	 * move UP/DOWN/LEFT/RIGHT
+	 * render
+	 * ready
 	 */
-
-	// FIX FIX FIX FIX
 
 	public void process(int id, String message) {
 		System.out.println("Message from client " + id + ": " + message);
