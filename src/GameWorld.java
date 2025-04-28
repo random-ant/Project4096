@@ -78,8 +78,6 @@ public class GameWorld extends World {
     private void addWalls() {
         Set<Coordinate> topWalls = game.getTopWalls();
         Set<Coordinate> leftWalls = game.getLeftWalls();
-        topWalls.add(new Coordinate(4, 0));
-        leftWalls.add(new Coordinate(0, 3));
     }
 
     /**

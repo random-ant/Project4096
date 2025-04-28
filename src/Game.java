@@ -52,8 +52,17 @@ public class Game {
      * first created.
      */
     private void addWalls() {
-        topWalls.add(new Coordinate(4, 0));
-        leftWalls.add(new Coordinate(0, 3));
+        topWalls.add(new Coordinate(1, 3));
+        topWalls.add(new Coordinate(3, 0));
+        topWalls.add(new Coordinate(5, 2));
+        topWalls.add(new Coordinate(7, 4));
+        topWalls.add(new Coordinate(9, 0));
+
+        leftWalls.add(new Coordinate(0, 9));
+        leftWalls.add(new Coordinate(3, 7));
+        leftWalls.add(new Coordinate(2, 4));
+        leftWalls.add(new Coordinate(5, 2));
+        leftWalls.add(new Coordinate(7, 8));
     }
 
     /**
