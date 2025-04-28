@@ -1,9 +1,18 @@
 import mayflower.*;
 
+/**
+ * Represents a block in the game grid. Each block has a value and a color.
+ */
 public class Block extends MovableGridItem {
     private int value;
     private BColor color;
 
+    /**
+     * Constructs a block with the specified value and color.
+     *
+     * @param value The value of the block.
+     * @param color The color of the block.
+     */
     public Block(int value, BColor color) {
         this.value = value;
         this.color = color;
@@ -56,18 +65,38 @@ public class Block extends MovableGridItem {
         return true;
     }
 
+    /**
+     * Gets the value of the block.
+     *
+     * @return The value of the block.
+     */
     public int getValue() {
         return value;
     }
 
+    /**
+     * Sets the value of the block.
+     *
+     * @param value The new value of the block.
+     */
     public void setValue(int value) {
         this.value = value;
     }
 
+    /**
+     * Gets the color of the block.
+     *
+     * @return The color of the block.
+     */
     public BColor getColor() {
         return color;
     }
 
+    /**
+     * Sets the color of the block.
+     *
+     * @param color The new color of the block.
+     */
     public void setColor(BColor color) {
         this.color = color;
     }
