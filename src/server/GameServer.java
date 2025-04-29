@@ -6,6 +6,9 @@ import java.util.*;
 import game.BColor;
 import game.Game;
 
+/**
+ * The server the game is hosted on.
+ */
 public class GameServer extends Server {
 	private Queue<Integer> clientsWaitingForGame;
 	private Map<Integer, Game> games;
