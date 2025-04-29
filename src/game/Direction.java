@@ -1,3 +1,5 @@
+package game;
+
 /**
  * Enum representing the possible movement directions in the game.
  */

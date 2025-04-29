@@ -1,4 +1,5 @@
-import java.sql.ClientInfoStatus;
+package game;
+
 import java.util.*;
 
 /**
@@ -8,12 +9,38 @@ import java.util.*;
  */
 public class Game {
     private int GRID_WIDTH = GameWorld.GRID_WIDTH, GRID_HEIGHT = GameWorld.GRID_HEIGHT;
+
+    /**
+     * The players' scores in game.
+     */
     private int blueScore = 0, redScore = 0;
+
+    /**
+     * A 2D representation of the grid.
+     */
     private MovableGridItem[][] grid;
+
+    /**
+     * The Color of the current player
+     */
     private BColor currentPlayer;
+
+    /**
+     * The player's color (the one represented by this instance of {@code Game}).
+     */
     private BColor myColor;
 
+    /**
+     * An {@code ArrayList} of all blocks that are part of a merging chain, but are
+     * not still. This is used so that the blocks that are still disappear at the
+     * same time at the blocks that are moving.
+     */
     private ArrayList<MovableGridItem> mergingStillBlocks = new ArrayList<>();
+
+    /**
+     * A {@code Set} of all blocks that need to animate to another tile to merge.
+     * This is used to keep track of ongoing and completed animations.
+     */
     private Set<MovableGridItem> currentlyMovingBlocks = new HashSet<>();
 
     /**
@@ -34,20 +61,6 @@ public class Game {
     }
 
     /**
-     * Swaps the active player.
-     *
-     * @return The {@code BColor} of the new active player.
-     */
-    public BColor swapActivePlayer() {
-        if (this.currentPlayer == BColor.BLUE) {
-            this.currentPlayer = BColor.RED;
-        } else if (this.currentPlayer == BColor.RED) {
-            this.currentPlayer = BColor.BLUE;
-        }
-        return this.currentPlayer;
-    }
-
-    /**
      * Adds walls to the grid. This method should be called when the game world is
      * first created.
      */
@@ -63,6 +76,20 @@ public class Game {
         leftWalls.add(new Coordinate(2, 4));
         leftWalls.add(new Coordinate(5, 2));
         leftWalls.add(new Coordinate(7, 8));
+    }
+
+    /**
+     * Swaps the active player.
+     *
+     * @return The {@code BColor} of the new active player.
+     */
+    public BColor swapActivePlayer() {
+        if (this.currentPlayer == BColor.BLUE) {
+            this.currentPlayer = BColor.RED;
+        } else if (this.currentPlayer == BColor.RED) {
+            this.currentPlayer = BColor.BLUE;
+        }
+        return this.currentPlayer;
     }
 
     /**
@@ -90,6 +117,10 @@ public class Game {
         return BColor.NEUTRAL;
     }
 
+    /**
+     * Shifts all blocks on the grid up. Should be called when the UP arrow key is
+     * pressed.
+     */
     private void shiftBlocksUp() {
         for (int j = 0; j < GRID_WIDTH; j++) {
             ArrayList<MovableGridItem> col = new ArrayList<MovableGridItem>();
@@ -105,7 +136,7 @@ public class Game {
                     // add empty blocks
                     result.addAll(Arrays.asList(new MovableGridItem[i - result.size()]));
 
-                    updateBlockVelocities(col, true);
+                    updateBlockAccelerations(col, true);
 
                     // reset for the next batch
                     col.clear();
@@ -124,6 +155,10 @@ public class Game {
         }
     }
 
+    /**
+     * Shifts all blocks on the grid down. Should be called when the DOWN arrow key
+     * is pressed.
+     */
     private void shiftBlocksDown() {
         for (int j = 0; j < GRID_WIDTH; j++) {
             ArrayList<MovableGridItem> col = new ArrayList<MovableGridItem>();
@@ -139,7 +174,7 @@ public class Game {
                     result.addAll(toAdd);
                     result.addAll(Arrays.asList(new MovableGridItem[GRID_HEIGHT - i - result.size()]));
 
-                    updateBlockVelocities(col, true);
+                    updateBlockAccelerations(col, true);
 
                     col.clear();
                     startOfChain = i;
@@ -155,6 +190,10 @@ public class Game {
         }
     }
 
+    /**
+     * Shifts all blocks on the grid left. Should be called when the LEFT arrow key
+     * is pressed.
+     */
     private void shiftBlocksLeft() {
         for (int i = 0; i < GRID_HEIGHT; i++) {
             ArrayList<MovableGridItem> row = new ArrayList<MovableGridItem>();
@@ -168,7 +207,7 @@ public class Game {
                     // add empty blocks
                     result.addAll(Arrays.asList(new MovableGridItem[j - result.size()]));
 
-                    updateBlockVelocities(row, false);
+                    updateBlockAccelerations(row, false);
 
                     row.clear();
                     startOfChain = j;
@@ -186,6 +225,10 @@ public class Game {
         }
     }
 
+    /**
+     * Shifts all blocks on the grid right. Should be called when the RIGHT arrow
+     * key is pressed.
+     */
     private void shiftBlocksRight() {
         for (int i = 0; i < GRID_HEIGHT; i++) {
             ArrayList<MovableGridItem> row = new ArrayList<MovableGridItem>();
@@ -201,7 +244,7 @@ public class Game {
                     // add empty blocks
                     result.addAll(Arrays.asList(new MovableGridItem[GRID_WIDTH - j - result.size()]));
 
-                    updateBlockVelocities(row, false);
+                    updateBlockAccelerations(row, false);
 
                     row.clear();
                     startOfChain = j;
@@ -217,7 +260,15 @@ public class Game {
         }
     }
 
-    private void updateBlockVelocities(ArrayList<MovableGridItem> line, boolean isVertical) {
+    /**
+     * Calculates and updates each {@code MovableGridItem}'s acceleration based on
+     * the current and target destination. Adds all moving blocks to
+     * {@code currentlyMovingBlocks}.
+     * 
+     * @param line       The line of the grid to update
+     * @param isVertical Whether or not the line is vertical or not
+     */
+    private void updateBlockAccelerations(ArrayList<MovableGridItem> line, boolean isVertical) {
         double ANIMATION_TIME = 8.5;
         double initialVelocity = 0;
 
@@ -338,18 +389,38 @@ public class Game {
         return result;
     }
 
+    /**
+     * Gets the color of this player
+     * 
+     * @return The color of this player
+     */
     public BColor getMyColor() {
         return myColor;
     }
 
+    /**
+     * Sets the color of this player
+     * 
+     * @param color The new color this player should be
+     */
     public void setMyColor(BColor color) {
         this.myColor = color;
     }
 
+    /**
+     * Gets whose turn it is currently
+     * 
+     * @return the {@code BColor} of whoever's turn it is.
+     */
     public BColor getCurrentPlayer() {
         return currentPlayer;
     }
 
+    /**
+     * Sets the current player
+     * 
+     * @param player the {@code BColor} of the new player
+     */
     public void setCurrentPlayer(BColor player) {
         currentPlayer = player;
     }

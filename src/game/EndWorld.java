@@ -1,3 +1,7 @@
+package game;
+
+ 
+
 import mayflower.*;
 
 /**
@@ -6,7 +10,8 @@ import mayflower.*;
 public class EndWorld extends World {
 
     /**
-     * Constructs an EndWorld instance with the specified win state and player color.
+     * Constructs an EndWorld instance with the specified win state and player
+     * color.
      *
      * @param win   Whether the player won or lost.
      * @param color The color of the player.

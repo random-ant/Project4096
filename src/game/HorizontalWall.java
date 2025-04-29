@@ -1,5 +1,6 @@
-import mayflower.Actor;
-import mayflower.MayflowerImage;
+package game;
+
+import mayflower.*;
 
 /**
  * Represents a horizontal wall in the game grid.

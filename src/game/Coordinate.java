@@ -1,3 +1,5 @@
+package game;
+
 /**
  * Represents a coordinate in the game grid.
  */
@@ -77,10 +79,20 @@ public class Coordinate {
         this.col = col;
     }
 
+    /**
+     * Gets the x-value of the coordinate (aka Col)
+     * 
+     * @return The column of the coordinate
+     */
     public int getX() {
         return getCol();
     }
 
+    /**
+     * Gets the y-value of the coordinate.
+     *
+     * @return The row of the coordinate.
+     */
     public int getY() {
         return getRow();
     }

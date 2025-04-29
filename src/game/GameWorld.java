@@ -1,3 +1,5 @@
+package game;
+
 import mayflower.*;
 import java.util.*;
 
@@ -64,20 +66,8 @@ public class GameWorld extends World {
         game.addBlock(1, 0, 2, BColor.NEUTRAL);
         game.addBlock(2, 0, 2, BColor.NEUTRAL);
 
-        addWalls();
         renderBaseGrid();
         renderGrid();
-    }
-
-    /**
-     * Adds walls to the grid. This method should be called when the game world is
-     * first created.
-     * 
-     * @return void
-     */
-    private void addWalls() {
-        Set<Coordinate> topWalls = game.getTopWalls();
-        Set<Coordinate> leftWalls = game.getLeftWalls();
     }
 
     /**
@@ -148,10 +138,11 @@ public class GameWorld extends World {
     }
 
     /**
-     * returns x and y
+     * Calculates what pixel a given block should be placed at given a Coordinate on
+     * the grid.
      * 
-     * @param c
-     * @return
+     * @param c The {@code Coordinate} (in tiles) of the wanted conversation
+     * @return The converted {@code Coordinate} in terms of pixels
      */
     public static Coordinate calculateBlockPixel(Coordinate c) {
         int col_coord = (c.getCol() * TILE_WIDTH) + OFFSET_X + BLOCK_BORDER_WIDTH;
@@ -159,6 +150,13 @@ public class GameWorld extends World {
         return new Coordinate(row_coord, col_coord);
     }
 
+    /**
+     * A method that processes whenever a block finishes its animation. Once all
+     * blocks are done with their animation, the grid is rendered and queued blocks
+     * are spawned.
+     * 
+     * @param b The {@code MovableGridItem} that has finished its animation
+     */
     public void removeMovingBlock(MovableGridItem b) {
         Set<MovableGridItem> currentlyMovingBlocks = game.getCurrentlyMovingBlocks();
         ArrayList<MovableGridItem> mergingStillBlocks = game.getMergingStillBlocks();
@@ -178,6 +176,9 @@ public class GameWorld extends World {
         }
     }
 
+    /**
+     * Called every gameframe.
+     */
     @Override
     public void act() {
         // if not player's turn OR in the middle of an animation, don't allow anything
@@ -212,6 +213,9 @@ public class GameWorld extends World {
         }
     }
 
+    /**
+     * Puts the queued blocks in {@code queuedBlocksToSpawn} into the grid.
+     */
     private void spawnQueuedBlocks() {
         for (Map.Entry<Coordinate, MovableGridItem> entry : queuedBlocksToSpawn.entrySet()) {
             Coordinate coord = entry.getKey();
@@ -237,6 +241,11 @@ public class GameWorld extends World {
         }
     }
 
+    /**
+     * Gets all empty tiles on the grid.
+     * 
+     * @return All empty tiles.
+     */
     private ArrayList<Coordinate> getEmptyTiles() {
         ArrayList<Coordinate> out = new ArrayList<Coordinate>(GRID_HEIGHT * GRID_WIDTH);
         for (int i = 0; i < GRID_HEIGHT; i++) {
@@ -293,10 +302,22 @@ public class GameWorld extends World {
         return Mayflower.isKeyDown(key) && !Mayflower.wasKeyDown(key);
     }
 
+    /**
+     * Gets the object representation of the {@code TurnGraphic}
+     * 
+     * @return The object representation of the {@code TurnGraphic}
+     */
     public TurnGraphic getTurnGraphic() {
         return turnGraphic;
     }
 
+    /**
+     * Adds a block to spawn into the queue.
+     * 
+     * @param row   the row of the block to spawn in
+     * @param col   the column of the block to spawn in
+     * @param value the value of the block to spawn in
+     */
     public void addQueuedBlock(int row, int col, int value) {
         Block b = new Block(value, BColor.NEUTRAL);
         queuedBlocksToSpawn.put(new Coordinate(row, col), b);
