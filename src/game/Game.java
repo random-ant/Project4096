@@ -131,13 +131,13 @@ public class Game {
             for (int i = 0; i <= GRID_HEIGHT; i++) {
                 // when there's a wall, merge what we already have
                 if (topWalls.contains(new Coordinate(i, j)) || i == GRID_HEIGHT) {
-                    ArrayList<MovableGridItem> toAdd = mergeLine(col, j, startOfChain, true, false);
+                    ArrayList<MovableGridItem> toAdd = mergeLine(col, j, startOfChain, Direction.UP);
                     result.addAll(toAdd);
 
                     // add empty blocks
                     result.addAll(Arrays.asList(new MovableGridItem[i - result.size()]));
 
-                    updateBlockAccelerations(col, true);
+                    updateBlockAccelerations(col, Direction.UP);
 
                     // reset for the next batch
                     col.clear();
@@ -170,12 +170,12 @@ public class Game {
                 col.add(grid[i][j]);
 
                 if (topWalls.contains(new Coordinate(i, j)) || i == 0) {
-                    ArrayList<MovableGridItem> toAdd = mergeLine(col, j, startOfChain, true, true);
+                    ArrayList<MovableGridItem> toAdd = mergeLine(col, j, startOfChain, Direction.DOWN);
                     // add empty blocks
                     result.addAll(toAdd);
                     result.addAll(Arrays.asList(new MovableGridItem[GRID_HEIGHT - i - result.size()]));
 
-                    updateBlockAccelerations(col, true);
+                    updateBlockAccelerations(col, Direction.DOWN);
 
                     col.clear();
                     startOfChain = i;
@@ -203,12 +203,12 @@ public class Game {
 
             for (int j = 0; j <= GRID_WIDTH; j++) {
                 if (leftWalls.contains(new Coordinate(i, j)) || j == GRID_WIDTH) {
-                    ArrayList<MovableGridItem> toAdd = mergeLine(row, i, startOfChain, false, false);
+                    ArrayList<MovableGridItem> toAdd = mergeLine(row, i, startOfChain, Direction.LEFT);
                     result.addAll(toAdd);
                     // add empty blocks
                     result.addAll(Arrays.asList(new MovableGridItem[j - result.size()]));
 
-                    updateBlockAccelerations(row, false);
+                    updateBlockAccelerations(row, Direction.LEFT);
 
                     row.clear();
                     startOfChain = j;
@@ -240,12 +240,12 @@ public class Game {
                 row.add(grid[i][j]);
 
                 if (leftWalls.contains(new Coordinate(i, j)) || j == 0) {
-                    ArrayList<MovableGridItem> toAdd = mergeLine(row, i, startOfChain, false, true);
+                    ArrayList<MovableGridItem> toAdd = mergeLine(row, i, startOfChain, Direction.RIGHT);
                     result.addAll(toAdd);
                     // add empty blocks
                     result.addAll(Arrays.asList(new MovableGridItem[GRID_WIDTH - j - result.size()]));
 
-                    updateBlockAccelerations(row, false);
+                    updateBlockAccelerations(row, Direction.RIGHT);
 
                     row.clear();
                     startOfChain = j;
@@ -266,10 +266,10 @@ public class Game {
      * the current and target destination. Adds all moving blocks to
      * {@link #currentlyMovingBlocks()}.
      * 
-     * @param line       The line of the grid to update
-     * @param isVertical Whether or not the line is vertical or not
+     * @param line     The line of the grid to update
+     * @param mergeDir The direction of merging.
      */
-    private void updateBlockAccelerations(ArrayList<MovableGridItem> line, boolean isVertical) {
+    private void updateBlockAccelerations(ArrayList<MovableGridItem> line, Direction mergeDir) {
         double ANIMATION_TIME = 8.5;
         double initialVelocity = 0;
 
@@ -279,7 +279,7 @@ public class Game {
                 continue;
 
             // calculate acceleration and set it
-            if (isVertical) {
+            if (mergeDir == Direction.UP || mergeDir == Direction.DOWN) {
                 double initialPos = b.getY();
                 double finalPos = GameWorld.calculateBlockPixel(b.getTargetDestination()).getY();
                 double acceleration = 2 * (finalPos - initialPos - initialVelocity * ANIMATION_TIME)
@@ -305,18 +305,17 @@ public class Game {
      * 
      * @param blocks      The line of blocks to merge. Any {@code null} values are
      *                    considered empty tiles.
-     * @param isVertical  Whether or not the blocks are moving vertically or not.
      * @param lineIndex   The index of the line in the larger grid that is being
      *                    merged.
      * @param offsetIndex The index of how far up the line the merge starts. This is
      *                    used for when we merge multiple times in one
      *                    row/col because of walls.
+     * @param mergeDir    The direction the line is being merged in
      * @return An {@link ArrayList} of merged blocks. All empty blocks will have
      *         been removed.
      */
     public ArrayList<MovableGridItem> mergeLine(ArrayList<MovableGridItem> blocks, int lineIndex, int offsetIndex,
-            boolean isVertical,
-            boolean isBackwards) {
+            Direction mergeDir) {
         Stack<MovableGridItem> stack = new Stack<MovableGridItem>();
         // index in row -> new index in row
         Map<MovableGridItem, Integer> positionShifts = new HashMap<MovableGridItem, Integer>();
@@ -359,6 +358,8 @@ public class Game {
         Collections.reverse(result);
 
         // update destination coordinates for block animations
+        boolean isBackwards = (mergeDir == Direction.DOWN || mergeDir == Direction.RIGHT);
+        boolean isVertical = (mergeDir == Direction.UP || mergeDir == Direction.DOWN);
         for (int i = 0; i < blocks.size(); i++) {
             if (blocks.get(i) == null)
                 continue;
