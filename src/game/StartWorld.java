@@ -10,7 +10,7 @@ public class StartWorld extends World {
     private Game game;
 
     /**
-     * Constructs a {@code StartWorld} instance with the specified client and game.
+     * Constructs a {@link StartWorld} instance with the specified client and game.
      * Sets the background to the start screen image.
      *
      * @param client The client associated with the start world.
@@ -42,7 +42,7 @@ public class StartWorld extends World {
     /**
      * Starts the game and transitions to the game world.
      *
-     * @return The newly created {@code GameWorld} instance.
+     * @return The newly created {@link GameWorld} instance.
      */
     public GameWorld startGame() {
         GameWorld world = new GameWorld(client, game);

@@ -134,7 +134,7 @@ public class GameWorld extends World {
     /**
      * Converts a coordinate in the grid to a pixel coordinate on the screen.
      * 
-     * @param c the {@code Coordinate} representation of the position in the grid to
+     * @param c the {@link Coordinate} representation of the position in the grid to
      *          convert.
      * @return an array of pixel coordinates. The first element is the X coordinate,
      *         and the second element is the Y coordinate.
@@ -149,8 +149,8 @@ public class GameWorld extends World {
      * Calculates what pixel a given block should be placed at given a Coordinate on
      * the grid.
      * 
-     * @param c The {@code Coordinate} (in tiles) of the wanted conversation
-     * @return The converted {@code Coordinate} in terms of pixels
+     * @param c The {@link Coordinate} (in tiles) of the wanted conversation
+     * @return The converted {@link Coordinate} in terms of pixels
      */
     public static Coordinate calculateBlockPixel(Coordinate c) {
         int col_coord = (c.getCol() * TILE_WIDTH) + OFFSET_X + BLOCK_BORDER_WIDTH;
@@ -163,7 +163,7 @@ public class GameWorld extends World {
      * blocks are done with their animation, the grid is rendered and queued blocks
      * are spawned.
      * 
-     * @param b The {@code MovableGridItem} that has finished its animation
+     * @param b The {@link MovableGridItem} that has finished its animation
      */
     public void removeMovingBlock(MovableGridItem b) {
         Set<MovableGridItem> currentlyMovingBlocks = game.getCurrentlyMovingBlocks();
@@ -222,7 +222,7 @@ public class GameWorld extends World {
     }
 
     /**
-     * Puts the queued blocks in {@code queuedBlocksToSpawn} into the grid.
+     * Puts the queued blocks in {@link #queuedBlocksToSpawn()} into the grid.
      */
     private void spawnQueuedBlocks() {
         for (Map.Entry<Coordinate, MovableGridItem> entry : queuedBlocksToSpawn.entrySet()) {
@@ -301,7 +301,7 @@ public class GameWorld extends World {
     /**
      * Returns whether or not a key was newly pressed down on this frame
      * 
-     * @param key A {@code Mayflower.KEYBOARD} constant that represents which key to
+     * @param key A {@code mayflower.KEYBOARD} constant that represents which key to
      *            check for
      * @return {@code true} if the key was newly pressed down on the frame,
      *         {@code false} otherwise
@@ -311,9 +311,9 @@ public class GameWorld extends World {
     }
 
     /**
-     * Gets the object representation of the {@code TurnGraphic}
+     * Gets the object representation of the {@link TurnGraphic}
      * 
-     * @return The object representation of the {@code TurnGraphic}
+     * @return The object representation of the {@link TurnGraphic}
      */
     public TurnGraphic getTurnGraphic() {
         return turnGraphic;

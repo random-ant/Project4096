@@ -26,19 +26,19 @@ public class Game {
     private BColor currentPlayer;
 
     /**
-     * The player's color (the one represented by this instance of {@code Game}).
+     * The player's color (the one represented by this instance of {@link Game}).
      */
     private BColor myColor;
 
     /**
-     * An {@code ArrayList} of all blocks that are part of a merging chain, but are
+     * An {@link ArrayList} of all blocks that are part of a merging chain, but are
      * not still. This is used so that the blocks that are still disappear at the
      * same time at the blocks that are moving.
      */
     private ArrayList<MovableGridItem> mergingStillBlocks = new ArrayList<>();
 
     /**
-     * A {@code Set} of all blocks that need to animate to another tile to merge.
+     * A {@link Set} of all blocks that need to animate to another tile to merge.
      * This is used to keep track of ongoing and completed animations.
      */
     private Set<MovableGridItem> currentlyMovingBlocks = new HashSet<>();
@@ -81,7 +81,7 @@ public class Game {
     /**
      * Swaps the active player.
      *
-     * @return The {@code BColor} of the new active player.
+     * @return The {@link BColor} of the new active player.
      */
     public BColor swapActivePlayer() {
         if (this.currentPlayer == BColor.BLUE) {
@@ -104,7 +104,8 @@ public class Game {
     /**
      * Gets the winner of the game.
      *
-     * @return The color of the winning player, or {@code NEUTRAL} if no winner.
+     * @return The {@link BColor} of the winning player, or {@code BColor.NEUTRAL}
+     *         if no winner.
      */
     public BColor getWinner() {
         if (isGameOver()) {
@@ -261,9 +262,9 @@ public class Game {
     }
 
     /**
-     * Calculates and updates each {@code MovableGridItem}'s acceleration based on
+     * Calculates and updates each {@link MovableGridItem}'s acceleration based on
      * the current and target destination. Adds all moving blocks to
-     * {@code currentlyMovingBlocks}.
+     * {@link #currentlyMovingBlocks()}.
      * 
      * @param line       The line of the grid to update
      * @param isVertical Whether or not the line is vertical or not
@@ -310,7 +311,7 @@ public class Game {
      * @param offsetIndex The index of how far up the line the merge starts. This is
      *                    used for when we merge multiple times in one
      *                    row/col because of walls.
-     * @return An {@code ArrayList} of merged blocks. All empty blocks will have
+     * @return An {@link ArrayList} of merged blocks. All empty blocks will have
      *         been removed.
      */
     public ArrayList<MovableGridItem> mergeLine(ArrayList<MovableGridItem> blocks, int lineIndex, int offsetIndex,
@@ -410,7 +411,7 @@ public class Game {
     /**
      * Gets whose turn it is currently
      * 
-     * @return the {@code BColor} of whoever's turn it is.
+     * @return the {@link BColor} of whoever's turn it is.
      */
     public BColor getCurrentPlayer() {
         return currentPlayer;
@@ -419,7 +420,7 @@ public class Game {
     /**
      * Sets the current player
      * 
-     * @param player the {@code BColor} of the new player
+     * @param player the {@link BColor} of the new player
      */
     public void setCurrentPlayer(BColor player) {
         currentPlayer = player;

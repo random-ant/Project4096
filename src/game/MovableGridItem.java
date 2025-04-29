@@ -11,7 +11,7 @@ public class MovableGridItem extends Actor {
     private double ax, ay; // Acceleration in the x and y directions
 
     /**
-     * Constructs a {@code MovableGridItem} instance with no target destination
+     * Constructs a {@link MovableGridItem} instance with no target destination
      * and zero velocity and acceleration.
      */
     public MovableGridItem() {
@@ -50,7 +50,7 @@ public class MovableGridItem extends Actor {
     /**
      * Gets the target destination of the grid item.
      *
-     * @return The target destination as a {@code Coordinate}.
+     * @return The target destination as a {@link Coordinate}.
      */
     public Coordinate getTargetDestination() {
         return targetDestination;
