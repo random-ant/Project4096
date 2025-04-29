@@ -50,14 +50,9 @@ public class GameServer extends Server {
 					int col = Integer.parseInt(parts[2]);
 					int val = Integer.parseInt(parts[3]);
 
-					// check if a piece can be placed at (row, col)
-					if (null == game.getBlock(row, col)) {
-						game.addBlock(row, col, val, BColor.NEUTRAL);
-						String response = "addblock " + row + " " + col + " " + val;
-						send(otherPlayer.get(id), response);
-					} else {
-						send(id, "error location is occupied: [" + message + "]");
-					}
+					game.addBlock(row, col, val, BColor.NEUTRAL);
+					String response = "addblock " + row + " " + col + " " + val;
+					send(otherPlayer.get(id), response);
 				} else if ("move".equals(parts[0])) {
 					String dir = parts[1];
 
