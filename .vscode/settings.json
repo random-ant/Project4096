@@ -9,5 +9,15 @@
     "editor.defaultFormatter": "redhat.java"
   },
   "files.autoSave": "afterDelay",
-  "files.autoSaveWhenNoErrors": true
+  "files.autoSaveWhenNoErrors": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/*.class": true,
+    "**/*.ctxt": true
+  },
+  "explorerExclude.backup": {}
 }

@@ -25,7 +25,7 @@ public class GameServer extends Server {
 	}
 
 	/*
-	 * Do something with a message sent from a client
+	 * Do something with a message sent from a client.
 	 *
 	 * Allowed Messages:
 	 * addblock row col val
@@ -33,7 +33,6 @@ public class GameServer extends Server {
 	 * render
 	 * ready
 	 */
-
 	public void process(int id, String message) {
 		System.out.println("Message from client " + id + ": " + message);
 		// get this client's game
@@ -95,6 +94,9 @@ public class GameServer extends Server {
 		send(id, "join");
 	}
 
+	/**
+	 * Start the game. Connect both clients and render the new grid.
+	 */
 	public void startNew() {
 		System.out.println("start new");
 		// If there are at least 2 clients waiting for a game...
@@ -162,6 +164,12 @@ public class GameServer extends Server {
 		}
 	}
 
+	/**
+	 * End the game.
+	 * 
+	 * @param clientA ID of client A
+	 * @param clientB ID of client B
+	 */
 	private void endGame(int clientA, int clientB) {
 		// disconnect both clients
 		disconnect(clientA);

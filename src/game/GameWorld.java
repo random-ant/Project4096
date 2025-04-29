@@ -14,6 +14,10 @@ public class GameWorld extends World {
      * The dimensions (in tiles) of the grid
      */
     public static int GRID_HEIGHT = 10, GRID_WIDTH = 10;
+
+    /**
+     * How far the grid graphic is from the edges of the screens (in pixels)
+     */
     public static int OFFSET_X = 45, OFFSET_Y = 250;
 
     /**
@@ -26,6 +30,10 @@ public class GameWorld extends World {
      */
     public static int BLOCK_WIDTH = 60, BLOCK_HEIGHT = 60;
 
+    /**
+     * How large (in pixels) the border of a given tile is. This is the distance
+     * between where a block ends and where the same tiles ends.
+     */
     public static int BLOCK_BORDER_WIDTH = (TILE_WIDTH - BLOCK_WIDTH) / 2, BLOCK_BORDER_HEIGHT = (TILE_HEIGHT
             - BLOCK_HEIGHT) / 2;
 
