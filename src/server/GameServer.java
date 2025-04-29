@@ -1,5 +1,10 @@
+package server;
+
 import mayflower.net.*;
 import java.util.*;
+
+import game.BColor;
+import game.Game;
 
 public class GameServer extends Server {
 	private Queue<Integer> clientsWaitingForGame;

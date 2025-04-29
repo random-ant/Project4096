@@ -1,3 +1,5 @@
+package server;
+
 import mayflower.net.Server;
 import mayflower.net.ServerGUI;
 

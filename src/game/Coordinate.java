@@ -1,3 +1,5 @@
+package game;
+
 /**
  * Represents a coordinate in the game grid.
  */
