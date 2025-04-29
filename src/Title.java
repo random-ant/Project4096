@@ -1,5 +1,8 @@
 import mayflower.*;
 
+/**
+ * Represents the title image of 4096.
+ */
 public class Title extends Actor {
 
     public Title() {

@@ -81,47 +81,4 @@ public class MovableGridItem extends Actor {
         this.ay = ay;
     }
 
-    // @Override
-    // public int hashCode() {
-    // final int prime = 31;
-    // int result = 1;
-    // result = prime * result + ((targetDestination == null) ? 0 :
-    // targetDestination.hashCode());
-    // long temp;
-    // temp = Double.doubleToLongBits(vx);
-    // result = prime * result + (int) (temp ^ (temp >>> 32));
-    // temp = Double.doubleToLongBits(vy);
-    // result = prime * result + (int) (temp ^ (temp >>> 32));
-    // temp = Double.doubleToLongBits(ax);
-    // result = prime * result + (int) (temp ^ (temp >>> 32));
-    // temp = Double.doubleToLongBits(ay);
-    // result = prime * result + (int) (temp ^ (temp >>> 32));
-    // return result;
-    // }
-
-    // @Override
-    // public boolean equals(Object obj) {
-    // if (this == obj)
-    // return true;
-    // if (obj == null)
-    // return false;
-    // if (getClass() != obj.getClass())
-    // return false;
-    // MovableGridItem other = (MovableGridItem) obj;
-    // if (targetDestination == null) {
-    // if (other.targetDestination != null)
-    // return false;
-    // } else if (!targetDestination.equals(other.targetDestination))
-    // return false;
-    // if (Double.doubleToLongBits(vx) != Double.doubleToLongBits(other.vx))
-    // return false;
-    // if (Double.doubleToLongBits(vy) != Double.doubleToLongBits(other.vy))
-    // return false;
-    // if (Double.doubleToLongBits(ax) != Double.doubleToLongBits(other.ax))
-    // return false;
-    // if (Double.doubleToLongBits(ay) != Double.doubleToLongBits(other.ay))
-    // return false;
-    // return true;
-    // }
-
 }

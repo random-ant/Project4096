@@ -35,6 +35,9 @@ public class TurnGraphic extends Actor {
         updateGraphic();
     }
 
+    /**
+     * Update the graphic based on whose current {@code turn} it is.
+     */
     private void updateGraphic() {
         if (turn == BColor.BLUE) {
             setImage(turnBlueImg);

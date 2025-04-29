@@ -36,6 +36,9 @@ public class Block extends MovableGridItem {
         }
     }
 
+    /**
+     * Called every game frame.
+     */
     public void act() {
         super.act();
     }
